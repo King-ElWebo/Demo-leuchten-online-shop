@@ -1,0 +1,29 @@
+# dependencies
+/node_modules/
+/.pnpm-store/
+
+# Next.js
+/.next/
+/out/
+
+# local environment
+.env*
+!.env.example
+
+# editors and operating systems
+.DS_Store
+Thumbs.db
+*.swp
+
+# logs and TypeScript caches
+*.log
+*.tsbuildinfo
+
+# generated QA evidence
+/artifacts/qa/playwright-report/
+/artifacts/qa/test-results/
+/artifacts/qa/screenshots/
+/playwright/.cache/
+
+# Playwright local state
+/.playwright-cli/

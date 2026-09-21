@@ -1,0 +1,7 @@
+.next
+node_modules
+next-env.d.ts
+pnpm-lock.yaml
+artifacts/qa/playwright-report
+artifacts/qa/test-results
+artifacts/qa/screenshots
