@@ -1,136 +1,108 @@
-# Tooling and autonomous workflow
+# Capability routing and local tooling
 
-This document routes skills, optional external capabilities, autonomous modes, and verification. It never grants permission to mutate an external system. [`AGENTS.md`](../../AGENTS.md) remains the workflow constitution, [`DESIGN.md`](../project/DESIGN.md) remains the visual authority, and [`ACCEPTANCE.md`](../project/ACCEPTANCE.md) remains the completion contract.
+This document explains how a run discovers and routes skills, MCP servers, external tools, and repository-owned validation. [`AGENTS.md`](../../AGENTS.md) owns orchestration, [`RUNBOOK.md`](RUNBOOK.md) owns execution order, and the project specifications remain authoritative in their domains.
 
-## Skill registry
+## Capability boundaries
 
-Skills are environment capabilities, not repository dependencies. The template does not vendor third-party skill content. Re-check availability, location, instructions, permissions, and licensing in every copied environment.
+- **Repository rules** in [`.agents/rules/`](../../.agents/rules/code-quality.md) are permanent constraints. They are always active and are never selected as skills.
+- **Skills** are readable instruction packages discovered in the current agent environment. They supply expertise and methods, not external access.
+- **MCP servers and external tools** are runtime capabilities discovered in the current environment. They may supply external data, applications, or interactive access, but they are not skills or website dependencies.
+- **Local tooling** is installed with this repository and provides deterministic checks regardless of optional skill or MCP availability.
 
-| Skill name or preferred equivalent                               | Capability                                                            | Location                   | Availability status    | Invocation phase                          | Required inputs                                  | Expected outputs                      | Conflicts                                | Fallback                             |
-| ---------------------------------------------------------------- | --------------------------------------------------------------------- | -------------------------- | ---------------------- | ----------------------------------------- | ------------------------------------------------ | ------------------------------------- | ---------------------------------------- | ------------------------------------ |
-| UI/UX design / `design`                                          | Information architecture and interaction design                       | Global/plugin if present   | VERIFY_PER_ENVIRONMENT | Specification review                      | `SITE.md`, `CONTENT.md`                          | Clear hierarchy and interaction model | Must not override `DESIGN.md`            | Apply project documents directly     |
-| UI/UX Pro Max / `ui-ux-pro-max`                                  | Broad UI/UX pattern support                                           | Global/plugin if present   | VERIFY_PER_ENVIRONMENT | Early architecture or critique            | Complete project specs                           | Relevant pattern guidance             | Avoid generic visual defaults            | Manual design review                 |
-| Creative Direction / `brand` or `frontend-design`                | Develop or interpret a distinct visual thesis                         | Global/plugin if present   | VERIFY_PER_ENVIRONMENT | Creative interpretation or Concept Sprint | Brand premise and references                     | Coherent direction candidates         | Project `DESIGN.md` wins                 | User-led direction in `DESIGN.md`    |
-| Emil Kowalski-style motion / `emil-design-eng`                   | Interaction feel, timing, and polish                                  | Global/plugin if present   | VERIFY_PER_ENVIRONMENT | Motion pass                               | Working interaction and motion personality       | Refined timing and behavior           | Must not invent the brand                | Motion rule plus browser review      |
-| Impeccable or equivalent / `design-review`, `transitions-polish` | Final visual and interaction refinement                               | Global/plugin if present   | VERIFY_PER_ENVIRONMENT | After coherent implementation             | Running site and screenshots                     | Prioritized polish findings           | Not an early layout generator            | Manual visual-cohesion pass          |
-| Next.js / `vercel:nextjs`                                        | Current App Router architecture and conventions                       | Plugin/global if present   | VERIFY_PER_ENVIRONMENT | Architecture and implementation           | Routes and current version                       | Version-appropriate implementation    | Project scope still controls features    | Official Next.js docs                |
-| React quality / `vercel:react-best-practices`                    | Component and rendering review                                        | Plugin/global if present   | VERIFY_PER_ENVIRONMENT | Implementation review                     | TSX code and data flow                           | Focused React findings                | Avoid premature abstraction              | `ENGINEERING.md` review              |
-| Responsive design / `ui-ux-audit` equivalent                     | Cross-width layout critique                                           | Global/plugin if present   | VERIFY_PER_ENVIRONMENT | Responsive pass                           | Required viewports and screenshots               | Breakpoint and composition fixes      | Mobile art direction in `DESIGN.md` wins | Manual viewport review               |
-| Accessibility / `web-accessibility`                              | Semantic, keyboard, contrast, and motion review                       | Global/plugin if present   | VERIFY_PER_ENVIRONMENT | Accessibility pass                        | Running site and content meaning                 | Actionable accessibility findings     | Automated scan is not sufficient alone   | Native semantics plus Playwright/axe |
-| Browser QA / `playwright-cli`                                    | Live route, interaction, console, screenshot, and viewport inspection | Global/local if present    | VERIFY_PER_ENVIRONMENT | Browser QA                                | Running app and route list                       | Reproducible browser evidence         | Cannot replace implementation            | Project Playwright suite             |
-| GSAP skill suite                                                 | GSAP implementation and performance guidance                          | Global/plugin if present   | ONLY_IF_GSAP_SELECTED  | Advanced motion pass                      | Approved complex choreography                    | Focused GSAP code and QA              | Do not add GSAP for simple transitions   | CSS or Motion for React              |
-| Asset curation / `imagegen` or approved search                   | Source or generate missing visual material                            | Built-in/plugin if present | ONLY_IF_ASSETS_MISSING | Asset preparation                         | Image direction, rights constraints, assignments | Stable local assets plus metadata     | Never copy protected references          | User-supplied/local licensed assets  |
+The repository does not vendor third-party skills or MCP servers. A name in this document describes a logical capability unless the preflight confirms an exact installed and readable package or callable tool. Never claim that a capability is installed from its name alone, and never hardcode a machine-specific installation path.
 
-When a skill is selected, read its current instructions. Do not assume the names or availability above remain unchanged.
+## Mandatory capability preflight
 
-## Skill routing
+Follow the preflight in [`AGENTS.md`](../../AGENTS.md) after readiness review:
 
-Use the smallest useful set for each phase:
+1. Enumerate skills the current environment can actually discover and read.
+2. Enumerate callable MCP servers and external tools.
+3. Map only relevant discoveries to the logical capabilities below.
+4. Choose the smallest useful set: normally one primary skill for a phase and, if it adds a different perspective, one critic.
+5. List unavailable optional capabilities and assign their documented fallback.
+6. Continue unless a capability is genuinely required by the project and no safe local fallback exists.
 
-1. Specification review
-2. Architecture pass
-3. Creative interpretation
-4. Core implementation
-5. Motion pass
-6. Responsive pass
-7. Accessibility pass
-8. Visual critique and refinement
-9. Browser QA
-10. Final engineering validation
-
-UI/UX skills support information architecture and interaction design. Creative-direction tools help form a unique thesis. The project [`DESIGN.md`](../project/DESIGN.md) always remains the visual authority. Motion skills improve behavior and timing without inventing the brand. Refinement skills are most useful after a coherent implementation exists. QA skills verify; they do not replace implementation. Do not activate every skill simultaneously.
-
-## Optional MCP and external capability registry
-
-No MCP server is installed by this repository. Discover current capabilities at run time and use a local fallback when optional access is absent.
-
-| Capability                           | Default use                                                                                              | Permission and routing rule                                                      | Fallback                                             |
-| ------------------------------------ | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| Browser automation                   | Route verification, interactions, console inspection, responsive checks, screenshots, visual QA          | Read and interact with the local site; save evidence locally                     | Project Playwright suite and manual browser          |
-| Open Design or equivalent design MCP | Reference analysis, early creative direction, limited concept exploration                                | Optional; never a runtime dependency or silent override of `DESIGN.md`           | Local references and design skill                    |
-| GitHub                               | Inspect reference repositories, compare changes, or perform explicitly requested version-control/PR work | Read-only by default; never push, open a PR, or mutate without authorization     | Local Git and downloaded approved reference material |
-| Vercel                               | Requested preview/production deployment, deployment inspection, build/runtime logs                       | Use only on explicit deployment request                                          | Local production build and logs                      |
-| Figma                                | Inspect a real supplied Figma source                                                                     | Use only when an actual source exists and access is authorized                   | Exported assets and written specifications           |
-| Image search or generation           | Prepare assets when suitable visuals are missing                                                         | Confirm rights and stable assignments; move final approved assets to local paths | User-supplied or licensed local assets               |
-| Documentation provider               | Resolve current, version-sensitive API behavior                                                          | Prefer primary official documentation                                            | Installed package types and local docs               |
-
-### MCP principles
-
-- MCP servers are optional production tools, never website runtime dependencies.
-- Prefer existing local or built-in capabilities before adding an external integration.
-- Use granular permissions and read-only access where sufficient.
-- External mutations require explicit authorization.
-- Record durable decisions, assets, and findings in local specifications.
-- Every optional capability needs a fallback.
-- Failure of an optional capability does not automatically block the project.
-
-## Autonomous modes
-
-### Direct Build
-
-Use when `SITE.md`, `DESIGN.md`, `CONTENT.md`, and `ACCEPTANCE.md` are complete, set to `READY`, mutually consistent, and visually locked. Implement the full scope through the [`AGENTS.md`](../../AGENTS.md) loop and stop only at acceptance or a genuine external blocker.
-
-### Concept Sprint
-
-Use when visual direction remains uncertain. Create only two or three limited directions, each containing:
-
-- hero
-- navigation
-- one representative content section
-- one product/project treatment
-- rough motion concept
-
-A Concept Sprint does not silently become a full website. After selection, transfer decisions into [`DESIGN.md`](../project/DESIGN.md), discard accidental prototype dependencies, set the project documents to `READY`, and start Direct Build.
-
-## Reusable production `/goal`
+Keep the report brief and evidence-based:
 
 ```text
-/goal
+Selected skills:
+- Creative direction: <exact discovered readable skill or none>
+- Motion: <exact discovered readable skill or none>
+- Accessibility: <exact discovered readable skill or none>
 
-Build and complete the showcase website defined by AGENTS.md and the
-documents in docs/project.
+Selected external tools:
+- Browser automation: <exact callable tool or none>
+- Design research: <exact callable tool or none>
 
-Follow the stable engineering and tooling contracts in docs/system.
-Work autonomously through specification review, implementation, browser
-verification, responsive QA, accessibility checks, motion refinement,
-visual polishing and final validation.
+Local baseline:
+- Prettier, documentation check, ESLint, TypeScript, Playwright + axe, production build
 
-Treat docs/project/ACCEPTANCE.md as the completion contract. Do not stop
-when the site merely compiles. Inspect all required routes and viewports,
-test the documented interactions, resolve browser and console errors,
-and run typecheck, lint, browser tests and the production build.
+Unavailable optional capabilities:
+- <logical capability or none>
 
-Use only the skills and MCP tools relevant to the current phase. The
-project-specific DESIGN.md remains the visual authority.
-
-Continue iterating until the acceptance criteria are satisfied or a
-genuine external blocker prevents completion. End with a concise,
-evidence-based completion report.
+Fallbacks:
+- <logical capability>: <local method>
 ```
 
-## When Teamwork is justified
+## Skill-routing matrix
 
-Normal 3–6 page showcases default to `/goal`. Use `/teamwork-preview` only when independent workstreams genuinely benefit from parallel ownership, such as:
+Every row is a logical capability, not an installation claim. An exact skill is usable only if the current environment discovers it and the agent can read its instructions.
 
-- extensive independent asset research
-- advanced 3D or complex motion
-- an unusually large route count
-- an important hero portfolio piece needing separate deep exploration
-- separate, substantial QA workstreams
+| Logical capability                          | Purpose                                                                                                               | Appropriate phase                                                                 | Use when                                                                                                                                            | Do not use when                                                                                                                      | Authority limit                                                                                              | Local fallback                                                                                                                                         | Discovery requirement                                                                                                                                                                                         |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Creative direction / UI design              | Interpret or critique information hierarchy, composition, interaction, and a distinctive visual thesis.               | Concept Sprint, design interpretation, or design critique.                        | The project needs one coherent design lens or a focused critique. Select one primary design skill and at most one separate critic.                  | Do not stack several overlapping design skills, reopen a `READY` direction without authorization, or replace project copy.           | `SITE.md` owns product behavior and `DESIGN.md` owns visual and motion direction.                            | Apply the completed project documents directly, use the repository design rule, and perform a manual visual-cohesion review.                           | Discover and read an exact UI/UX, creative-direction, brand, frontend-design, or clearly equivalent skill. Familiar labels such as “UI/UX Pro Max” are not proof of availability.                             |
+| Next.js architecture                        | Apply current App Router, rendering, metadata, image, font, and server/client conventions.                            | Architecture and implementation.                                                  | The exact installed Next.js version or an unfamiliar framework convention needs specialist guidance.                                                | Do not use it to add routes, services, or dependencies outside `SITE.md` and `STACK.md`.                                             | `ENGINEERING.md`, `STACK.md`, installed-version documentation, and project scope win.                        | Read the version-matched documentation under the installed Next.js package and use official documentation for unresolved version-sensitive questions.  | Discover and read an applicable Next.js skill; confirm it addresses the installed version.                                                                                                                    |
+| React quality                               | Review component boundaries, hooks, rendering, semantics, performance, and TypeScript after meaningful TSX exists.    | After component implementation and during refactoring.                            | A focused review can simplify real components or correct rendering and interaction issues.                                                          | Do not abstract speculative reuse, replace Server Components without cause, or run before there is meaningful component code.        | Project behavior and repository component-boundary rules win.                                                | Review against `ENGINEERING.md`, ESLint, TypeScript, React/Next documentation, and observed browser behavior.                                          | Discover and read an exact React quality or performance skill.                                                                                                                                                |
+| Motion design                               | Guide interaction feel, easing, timing, choreography, interruption, and reduced-motion behavior.                      | Dedicated motion pass and motion critique.                                        | `DESIGN.md` calls for purposeful motion and the working interface is ready to tune. An Emil-Kowalski-style motion capability or equivalent may fit. | Do not invent motion density, add decorative choreography, or override a quiet direction.                                            | `DESIGN.md` controls motion character and density; the motion rule controls reusable safeguards.             | Use Motion for React and CSS already in the stack, follow the motion rule, honor reduced motion, and inspect behavior in the browser.                  | Discover and read an exact motion skill; a style reference in this matrix is not an installed package claim.                                                                                                  |
+| Visual refinement / “Impeccable” equivalent | Find hierarchy, spacing, typography, crop, consistency, and interaction-polish issues in an already coherent build.   | Final visual critique and polish.                                                 | A refinement skill offers a distinct critic perspective after implementation.                                                                       | Do not use it as a second competing creative direction or as proof that visual QA occurred.                                          | It may recommend refinements only inside `DESIGN.md`, `SITE.md`, and `CONTENT.md`.                           | Inspect required screenshots and live viewports against the design specification and acceptance criteria.                                              | Use only an exact installed, readable visual-refinement or design-review skill. Never assume a capability named “Impeccable” exists.                                                                          |
+| Responsive design                           | Review transformation across widths, content priority, crops, navigation, density, and touch behavior.                | Responsive implementation and viewport refinement.                                | Layout decisions differ across desktop, tablet, mobile, or intermediate widths.                                                                     | Do not treat mobile as stacked desktop or invent different content without `CONTENT.md` support.                                     | `DESIGN.md` owns responsive art direction; `CONTENT.md` owns approved content variants.                      | Implement CSS/container/media-query behavior, exercise Playwright viewports, and manually inspect intermediate widths.                                 | Discover and read an exact responsive-design or UI-audit skill.                                                                                                                                               |
+| Accessibility                               | Guide semantic structure, keyboard behavior, focus, labels, contrast, touch targets, and reduced motion.              | During implementation and final accessibility review.                             | Any route or interaction is being built or verified.                                                                                                | Do not treat automated axe output as a substitute for keyboard, focus, meaning, and interaction reasoning.                           | It cannot change product scope or approved copy except to report a conflict requiring an owning-spec update. | Use native semantics, manual keyboard and focus review, browser inspection, the accessibility rule, and Playwright axe scans.                          | Discover and read an exact accessibility skill when available; accessibility work remains required without one.                                                                                               |
+| Browser QA                                  | Exercise real navigation, scrolling, hover, focus, touch-size, runtime behavior, and visual layout.                   | Iterative QA and final browser verification.                                      | The running application needs interaction sequences or visual inspection beyond assertions alone.                                                   | Do not replace deterministic Playwright coverage or infer visual quality from generated files without looking at them.               | Observations create implementation work; they do not rewrite specifications.                                 | Use repository Playwright tests, Playwright CLI/UI where available, generated screenshots, and manual browser review as the last fallback.             | Discover and read an exact browser-verification skill and confirm its browser tooling is callable.                                                                                                            |
+| GSAP expertise                              | Implement or review complex timelines, scroll choreography, or effects that Motion and CSS cannot reasonably express. | Architecture decision and dedicated motion implementation.                        | `DESIGN.md` explicitly requires complex choreography and a documented comparison shows GSAP is justified.                                           | Do not use for routine reveals, hover states, simple transitions, or as a default animation system.                                  | GSAP is opt-in under `STACK.md`; it cannot expand motion direction or density.                               | Use Motion for React and CSS, simplify the effect while preserving design intent, or pause only if the exact required behavior has no safe equivalent. | Discover and read a GSAP skill if present. If the dependency is justified, handle installation deliberately under `STACK.md` and the current user-authorized scope; never assume the skill or package exists. |
+| Asset or image capability                   | Find, generate, assess, crop, or prepare project-permitted imagery.                                                   | Asset planning, approved research, implementation, or responsive crop refinement. | Project specifications permit discovery or generation and define rights, use, and art direction.                                                    | Do not fabricate client assets, ignore licensing, replace supplied media, or use temporary remote output as a production dependency. | `DESIGN.md` controls image direction and `CONTENT.md` controls assignments, alt text, source, and rights.    | Use supplied assets, local editing tools, CSS crops, and explicit placeholders only when the specifications permit them.                               | Discover and read an exact image or asset skill and verify that any required tool is callable.                                                                                                                |
 
-Parallel work must still converge through the same project documents and acceptance contract.
+## MCP and external-tool routing
 
-## Local commands and evidence
+MCP tools are optional runtime capabilities. The repository installs none, and a copied project must remain implementable and verifiable without them whenever a local fallback exists.
 
-| Command            | Purpose                                                                           |
-| ------------------ | --------------------------------------------------------------------------------- |
-| `pnpm dev`         | Run the local Next.js development server.                                         |
-| `pnpm lint`        | Run ESLint directly.                                                              |
-| `pnpm typecheck`   | Run strict TypeScript checks without output.                                      |
-| `pnpm docs:check`  | Check required documentation, local links, and template/ready status consistency. |
-| `pnpm test:e2e`    | Run mobile, desktop, accessibility, console, overflow, and screenshot checks.     |
-| `pnpm test:e2e:ui` | Open Playwright’s local UI for focused debugging.                                 |
-| `pnpm build`       | Create the production build.                                                      |
-| `pnpm qa`          | Run the complete local validation sequence.                                       |
+| MCP or external capability                       | Appropriate phase and use                                                                                                                                          | Permission expectations                                                                                                                                                     | Durable local output                                                                                                                           | Fallback when unavailable                                                                                                                                         |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Browser automation MCP                           | Iterative and final QA: navigate, scroll, hover, focus, inspect defined viewports, collect screenshots, and check console/runtime behavior.                        | Local-site inspection and reversible browser interaction are normal QA. Do not submit external forms, publish, purchase, or mutate unrelated systems without authorization. | Test cases, fixed code, local screenshots, console notes, and acceptance evidence under the repository.                                        | Run Playwright tests and screenshots; use Playwright UI/CLI if available; perform documented manual review only as the last interactive fallback.                 |
+| Open Design MCP or equivalent design MCP         | Concept Sprint or reference research; after `DESIGN.md` is `READY`, use only for implementation support or critique unless the user authorizes a direction change. | Research is read-only by default. Any write to an external design workspace needs explicit authorization.                                                                   | Chosen decisions recorded in `DESIGN.md` or local notes, plus lawful local references or assets where permitted.                               | Use supplied references, one discovered design skill, the project documents, and local visual critique.                                                           |
+| Figma MCP                                        | Inspect a real supplied Figma source or perform an explicitly requested Figma task. No Figma file is required for a showcase build.                                | Read supplied sources by default; creating or editing Figma content requires explicit authorization and access.                                                             | Implemented local components/tokens/assets and documented decisions; do not leave the build dependent on MCP availability.                     | Build directly from `DESIGN.md`, `CONTENT.md`, supplied exports, and local references.                                                                            |
+| Image search or image-generation MCP             | Discover or generate imagery only when project specifications permit it.                                                                                           | Respect project authorization, licensing, attribution, privacy, and content restrictions. External publishing or account mutation is out of scope.                          | Final approved assets stored under `public/media/` with source, rights, assignment, alt text, focal point, and crop decisions in `CONTENT.md`. | Use supplied assets, permitted local generation/editing, or specification-approved placeholders. Never retain temporary MCP URLs as production assets.            |
+| GitHub MCP                                       | Read-only repository, issue, release, or code inspection when it materially helps implementation.                                                                  | Commits, pushes, branches, issues, pull requests, reviews, merges, and other mutations require explicit user authorization.                                                 | Relevant findings incorporated into local code or concise local notes; repository changes remain local until separately authorized.            | Inspect the local Git repository and installed dependency sources; use official project documentation for external facts.                                         |
+| Vercel MCP                                       | Deployment, deployment inspection, logs, or platform operations only when the user explicitly requests them.                                                       | No automatic deployment, project creation, environment change, domain change, or platform mutation during a normal showcase run.                                            | Authorized configuration changes documented locally and deployment evidence recorded only when deployment is in scope.                         | Complete local `pnpm build` and browser QA. A normal implementation run ends locally.                                                                             |
+| Documentation MCP or official documentation tool | Resolve version-sensitive framework, browser, library, or platform questions.                                                                                      | Prefer read-only official sources; do not change accounts, projects, or configuration merely to read documentation.                                                         | Version-relevant decisions reflected in code, tests, or concise local documentation when they affect future maintenance.                       | Read installed package documentation first, then official documentation through available read-only web tools. Avoid generic search when a primary source exists. |
 
-Generated Playwright reports, test results, and screenshots live under [`artifacts/qa/`](../../artifacts/qa/README.md) and are ignored except for the explanatory README. Update `tests/e2e/routes.ts` whenever public routes change.
+The browser verification model is deliberately additive:
+
+```text
+Playwright = always-required automated baseline
+Browser MCP = additional interactive and visual verification
+Manual review = last fallback if interactive automation is unavailable
+```
+
+## Repository-owned deterministic baseline
+
+These checks do not depend on optional MCP access or globally installed skills.
+
+| Check                              | Command             | Contract                                                                                                                                                                         |
+| ---------------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Formatting                         | `pnpm format:check` | Repository files match Prettier formatting.                                                                                                                                      |
+| Documentation integrity            | `pnpm docs:check`   | Required documents and runbook exist, `AGENTS.md` references the runbook, local Markdown links resolve, and project readiness markers are coherent. Template mode remains valid. |
+| Static code quality                | `pnpm lint`         | ESLint and Next.js rules pass without suppressing root causes.                                                                                                                   |
+| Type safety                        | `pnpm typecheck`    | Strict TypeScript passes.                                                                                                                                                        |
+| Browser and accessibility baseline | `pnpm test:e2e`     | Registered routes pass runtime, console, overflow, serious/critical axe, and screenshot coverage. Axe does not replace keyboard or focus reasoning.                              |
+| Production readiness               | `pnpm build`        | The Next.js production build completes.                                                                                                                                          |
+| Aggregate gate                     | `pnpm qa`           | Formatting, docs, lint, types, Playwright, and production build all pass in sequence.                                                                                            |
+
+Playwright is mandatory baseline QA, not a fallback. Keep [`tests/e2e/routes.ts`](../../tests/e2e/routes.ts) aligned with `SITE.md` and add project-specific interaction assertions where acceptance requires them. Browser MCP, when available, adds exploratory and visual coverage; it does not reduce the Playwright obligation.
+
+Generated evidence belongs under [`artifacts/qa/`](../../artifacts/qa/README.md). Review screenshots at the project-defined viewports and at relevant intermediate widths. A screenshot file that nobody inspected is not visual evidence.
+
+## Execution modes and handoff
+
+Direct Build, Concept Sprint, Teamwork criteria, platform entry points, and the reusable prompts live in [`RUNBOOK.md`](RUNBOOK.md). All modes use the same authority hierarchy and local completion gate.
+
+If an optional capability is missing, note it once, use the matrix fallback, and continue. Stop only when the project explicitly requires an external capability, the current environment cannot supply it, and no safe local alternative can satisfy the owning specification. Report the exact missing capability, affected criterion, attempted fallback, and required user action.

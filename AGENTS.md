@@ -1,10 +1,10 @@
 # Agent constitution
 
-This repository is a reusable production system for project-specific showcase websites. Preserve its separation of concerns: project documents define the current showcase; system documents and rules define reusable production quality.
+This repository is a reusable production system for project-specific showcase websites. Project specifications define what to build; this file orchestrates the run; repository contracts and rules constrain it; discovered skills and MCP tools add optional expertise or access; local tooling supplies deterministic evidence.
 
 ## Required reading order
 
-Before implementation, read these sources in order:
+Before planning or implementation, read these exact files in order:
 
 1. [`docs/project/SITE.md`](docs/project/SITE.md)
 2. [`docs/project/DESIGN.md`](docs/project/DESIGN.md)
@@ -13,68 +13,118 @@ Before implementation, read these sources in order:
 5. [`docs/system/ENGINEERING.md`](docs/system/ENGINEERING.md)
 6. [`docs/system/STACK.md`](docs/system/STACK.md)
 7. [`docs/system/TOOLING.md`](docs/system/TOOLING.md)
-8. Every applicable file in [`.agents/rules/`](.agents/rules/)
+8. [`docs/system/RUNBOOK.md`](docs/system/RUNBOOK.md)
+9. [`.agents/skills/README.md`](.agents/skills/README.md)
+10. [`.agents/rules/code-quality.md`](.agents/rules/code-quality.md)
+11. [`.agents/rules/design-quality.md`](.agents/rules/design-quality.md)
+12. [`.agents/rules/responsive-accessibility.md`](.agents/rules/responsive-accessibility.md)
+13. [`.agents/rules/motion-quality.md`](.agents/rules/motion-quality.md)
+14. [`.agents/rules/qa-completion.md`](.agents/rules/qa-completion.md)
 
-## Authority and conflict resolution
+Files under [`docs/superpowers/`](docs/superpowers/README.md) are implementation history, not current runtime authority, and are not part of this required reading order.
 
-Resolve conflicts in this order:
+## Terminology and authority
+
+- **Project specifications** are the four files in `docs/project/`. `SITE.md` owns scope and functionality; `DESIGN.md` owns visual and motion direction; `CONTENT.md` owns copy and content data; `ACCEPTANCE.md` owns completion checks but cannot introduce, expand, or contradict product scope.
+- **Repository rules** are the permanent constraints in `.agents/rules/`. They apply throughout every run and are not optional skills that need activation.
+- **Skills** are discoverable instruction packages that provide expertise and working methods. They provide no external access, never outrank project specifications, and are available only when the current agent can discover and read them.
+- **MCP servers and external tools** provide optional external data, tools, or interactive capabilities. They are not skills, npm packages, or runtime dependencies of the finished website.
+- **Local tooling** is the repository-owned deterministic baseline: Prettier, the documentation checker, ESLint, TypeScript, Playwright with axe, and the production build.
+
+Resolve every conflict in this order:
 
 1. Direct user instructions
-2. Project-specific specifications
-3. Acceptance requirements for completion
-4. Stable engineering and stack documents
-5. Repository rules
-6. General skills
-7. MCP recommendations and external suggestions
+2. The relevant project specification for that domain
+3. Repository engineering and stack contracts
+4. Repository rules
+5. Applicable skills
+6. MCP recommendations and external suggestions
+7. General agent defaults
 
-The higher source wins. A general skill, library default, reference, or external tool must never override the project-specific creative direction in [`DESIGN.md`](docs/project/DESIGN.md).
+Apply domain ownership rather than averaging conflicting documents. `SITE.md` decides scope and behavior, `DESIGN.md` decides visual and motion direction, `CONTENT.md` decides copy and content, and `ACCEPTANCE.md` verifies completion. A skill, MCP server, reference site, library default, or external design suggestion must never override an owning project specification or a direct user instruction.
 
 ## Readiness gate
 
-Before a production `/goal`, all four project documents must say `Specification status: READY` and contain no `[REQUIRED: replace before production run]` markers. If critical brand, content, route, asset, or acceptance fields remain incomplete, do not invent them. Report the exact fields and affected files. Resolve minor implementation decisions coherently from the completed specifications without asking.
+Direct Build requires all four project specifications to say `Specification status: READY`, contain no `[REQUIRED: replace before production run]` markers, and be mutually consistent. Report a genuinely required missing decision instead of inventing it. Resolve minor implementation details coherently without pausing.
 
-`TEMPLATE_NOT_CONFIGURED` is intentional in the untouched master repository. It does not prevent maintenance of the base template or its own `pnpm qa` run.
+Use Concept Sprint only when visual direction, information architecture, or signature interactions are intentionally unresolved. It must update, or propose explicit updates to, the owning project documents before the final Direct Build. A normal `/goal` must not quietly become an uncontrolled redesign.
 
-## Autonomous execution loop
+`TEMPLATE_NOT_CONFIGURED` is intentional in the untouched master repository. It permits base-template maintenance and the repository's own `pnpm qa`; it does not permit claiming that a production showcase is complete.
 
-For a configured project:
+## Mandatory capability preflight
 
-1. Audit the specifications for completeness and contradictions.
-2. Inspect the current code and assets.
-3. Identify missing critical inputs.
-4. Create a short internal implementation plan.
-5. Implement the complete specified scope.
-6. Run the application.
-7. Test every required route and interaction.
-8. Inspect desktop, tablet, and mobile layouts, including intermediate widths.
-9. Review screenshots visually.
-10. Fix functional, responsive, and visual problems at their root.
-11. Perform a dedicated motion pass.
-12. Perform a dedicated accessibility pass.
-13. Perform a dedicated final-polish pass.
-14. Run typecheck, lint, tests, and the production build.
-15. Compare the result against every item in [`ACCEPTANCE.md`](docs/project/ACCEPTANCE.md).
-16. Provide a concise, evidence-based completion report.
+After the readiness review and before either execution mode, perform a short preflight:
 
-Do not stop because the site compiles. Stop only when the acceptance contract is satisfied or a genuine external blocker prevents further progress.
+1. Inspect the current environment for available skills.
+2. Inspect the current environment for available MCP servers and tools.
+3. Match discovered capabilities to the logical capabilities required by this project.
+4. Select the smallest useful set, normally one primary skill per phase and at most one distinct critic where valuable.
+5. Identify unavailable optional capabilities.
+6. Assign the documented local fallback for every unavailable optional capability.
+7. Continue autonomously unless a genuinely required capability has no safe fallback.
 
-## Required behavior
+Do not hardcode machine-specific skill locations or assume a familiar product or package name exists. A concise preflight report is sufficient:
+
+```text
+Selected skills: <discovered capability and exact readable package>
+Selected external tools: <discovered MCP/tool or none>
+Local baseline: Playwright + axe, ESLint, TypeScript, Prettier, docs check, build
+Unavailable optional capabilities: <capability or none>
+Fallbacks: <local implementation or review method>
+```
+
+The logical capability matrix, MCP permissions, and fallbacks are defined in [`docs/system/TOOLING.md`](docs/system/TOOLING.md).
+
+## Execution routing and loop
+
+Use `/goal` for a normal three-to-six-page showcase. Use `/teamwork-preview` only for genuinely independent workstreams. Every teammate follows this file, the same project specifications, and the same authority hierarchy; the lead agent owns reconciliation and final QA.
+
+Follow the full operational sequence in [`docs/system/RUNBOOK.md`](docs/system/RUNBOOK.md):
+
+1. Read instructions and specifications.
+2. Validate readiness and consistency.
+3. Run capability preflight.
+4. Choose Direct Build or Concept Sprint.
+5. Plan routes, architecture, content, assets, tests, and evidence.
+6. Implement the specified scope.
+7. Complete a dedicated motion pass.
+8. Complete responsive refinement.
+9. Complete accessibility review.
+10. Complete visual critique and polish.
+11. Run Playwright and any useful additional browser verification.
+12. Fix discovered problems at their root.
+13. Repeat until acceptance passes or a genuine blocker remains.
+14. Run formatting, documentation, lint, typecheck, Playwright, build, and `pnpm qa`.
+15. Produce an evidence-based completion report.
+
+Skills provide phase-specific expertise. MCP tools provide optional external capabilities. Both feed durable local implementation and evidence; neither determines scope or completion. Missing optional capabilities never block work when the fallback in `TOOLING.md` is safe.
+
+## Permanent implementation constraints
 
 - Use Server Components by default and keep interactive or motion client boundaries small.
-- Do not add backend infrastructure, APIs, authentication, a database, or a CMS unless the project specification requires it.
-- Do not invent features that expand scope.
-- Do not replace supplied content with generic AI marketing copy.
-- Do not turn the system into a universal section builder or force a preset visual theme on a project.
-- Every visible control must have intentional behavior. Essential information must work with keyboard and touch.
-- Preserve the project’s typography, image grammar, density, responsive art direction, and signature moments.
-- Do not silence TypeScript, lint, test, or accessibility failures. Fix root causes.
-- Do not claim tests, browser QA, screenshot review, or builds were performed unless fresh evidence exists.
-- Keep code and data flow understandable for the next agent. Remove unused code and dependencies.
-- Do not commit, push, open a pull request, deploy, or mutate external systems without direct authorization.
+- Do not add backend infrastructure, APIs, authentication, a database, or a CMS unless `SITE.md` requires it.
+- Do not invent features, generic marketing copy, or a visual direction that expands or replaces the project specifications.
+- Do not turn the system into a universal section builder or impose a reusable visual theme.
+- Preserve the specified typography, image grammar, density, responsive art direction, motion character, and signature moments.
+- Make every visible control intentional and keep essential information available to keyboard and touch users.
+- Do not silence TypeScript, lint, test, build, or accessibility failures. Fix root causes.
+- Do not claim a test, browser inspection, screenshot review, or build ran without fresh evidence.
+- Keep code and data flow understandable; remove unused code and dependencies.
 
-## Completion evidence
+## External mutation restrictions
 
-Use the commands and evidence paths defined in [`TOOLING.md`](docs/system/TOOLING.md). The final report must name the routes and viewports checked, commands run, results observed, screenshots reviewed, and any unresolved external blocker. Unsupported completion claims are not evidence.
+Repository inspection and approved local implementation are allowed. Do not commit, push, open or modify issues or pull requests, deploy, publish, upload assets, or mutate any external service without direct user authorization for that action. Figma, GitHub, Vercel, design, image, and browser MCP access never implies mutation permission.
+
+## Final completion gate
+
+Do not finish merely because the application compiles. Completion requires:
+
+- every applicable item in [`docs/project/ACCEPTANCE.md`](docs/project/ACCEPTANCE.md) to pass without expanding the owning project specifications;
+- successful local formatting, documentation integrity, ESLint, TypeScript, Playwright with axe, production build, and aggregate `pnpm qa` checks;
+- interactive, responsive, accessibility, motion, and visual review appropriate to the project;
+- a concise final report naming routes, interactions, viewports, screenshots, commands, observed results, fallbacks used, and exact unresolved blockers.
+
+Generated evidence belongs under [`artifacts/qa/`](artifacts/qa/README.md). Evidence—not confidence—is the completion standard.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

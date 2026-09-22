@@ -1,5 +1,7 @@
 # Showcase Website Factory Design
 
+> **Historical record:** This document records the original factory design. It is not runtime authority; follow [`AGENTS.md`](../../../AGENTS.md) and the current project and system documents.
+
 ## Purpose
 
 Build a small, reusable master repository for autonomous production of premium 3–6 page showcase websites. The repository standardizes specifications, engineering constraints, agent workflow, accessibility, motion quality, browser QA, and completion evidence while leaving every project’s visible identity open.

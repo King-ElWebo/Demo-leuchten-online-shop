@@ -12,6 +12,7 @@ const requiredFiles = [
   'docs/system/ENGINEERING.md',
   'docs/system/STACK.md',
   'docs/system/TOOLING.md',
+  'docs/system/RUNBOOK.md',
   '.agents/rules/code-quality.md',
   '.agents/rules/design-quality.md',
   '.agents/rules/responsive-accessibility.md',
@@ -56,6 +57,14 @@ async function markdownFiles(directory) {
 for (const relativePath of requiredFiles) {
   if (!(await exists(path.join(root, relativePath)))) {
     failures.push(`Missing required documentation: ${relativePath}`);
+  }
+}
+
+const agentsPath = path.join(root, 'AGENTS.md');
+if (await exists(agentsPath)) {
+  const agentsContent = await readFile(agentsPath, 'utf8');
+  if (!agentsContent.includes('docs/system/RUNBOOK.md')) {
+    failures.push('AGENTS.md does not reference docs/system/RUNBOOK.md.');
   }
 }
 

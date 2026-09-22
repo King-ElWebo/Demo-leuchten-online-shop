@@ -2,7 +2,7 @@
 
 Specification status: TEMPLATE_NOT_CONFIGURED
 
-This file owns approved visible copy, structured content, contact details, and media assignments. Implementation modules such as `products.ts` or `projects.ts` may be derived from this document, but do not maintain conflicting manual sources of truth. Scope belongs in [`SITE.md`](SITE.md); visual use belongs in [`DESIGN.md`](DESIGN.md).
+This file owns the actual approved copy, products, projects, structured content data, contact details, and media assignments. Implementation modules such as `products.ts` or `projects.ts` may be derived from this document, but do not maintain conflicting manual sources of truth. Scope and behavior belong in [`SITE.md`](SITE.md), visual use and motion direction in [`DESIGN.md`](DESIGN.md), and completion checks in [`ACCEPTANCE.md`](ACCEPTANCE.md).
 
 Do not use Lorem Ipsum. Do not replace supplied copy with generic AI marketing language.
 

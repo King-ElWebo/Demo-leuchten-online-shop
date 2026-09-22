@@ -2,7 +2,7 @@
 
 Specification status: TEMPLATE_NOT_CONFIGURED
 
-This file owns the current showcase’s purpose, scope, routes, user journeys, and functional behavior. Describe each section’s purpose and content before deciding its layout. Creative decisions belong in [`DESIGN.md`](DESIGN.md), approved wording in [`CONTENT.md`](CONTENT.md), and completion checks in [`ACCEPTANCE.md`](ACCEPTANCE.md).
+This file owns the current showcase’s purpose, product scope, routes, sections, user journeys, behavior, and non-goals. Describe each section’s purpose and content before deciding its layout. Visual and motion direction belongs in [`DESIGN.md`](DESIGN.md), approved copy and content data in [`CONTENT.md`](CONTENT.md), and completion checks in [`ACCEPTANCE.md`](ACCEPTANCE.md). Acceptance checks may verify this scope but may not silently expand or contradict it.
 
 Change the status to `READY` only when every required field is resolved and no required marker remains.
 

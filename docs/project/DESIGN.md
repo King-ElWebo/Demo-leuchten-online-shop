@@ -2,7 +2,7 @@
 
 Specification status: TEMPLATE_NOT_CONFIGURED
 
-This file is the visual authority for one showcase. It contains project-specific creative direction—not generic motion tutorials, library rules, or coding guidance. Implementation constraints live in [`ENGINEERING.md`](../system/ENGINEERING.md); approved words and images live in [`CONTENT.md`](CONTENT.md).
+This file owns the visual identity, typography, layout and composition, imagery, responsive art direction, and motion direction for one showcase. It contains project-specific creative direction—not generic motion tutorials, library rules, or coding guidance. Scope and behavior live in [`SITE.md`](SITE.md), implementation constraints in [`ENGINEERING.md`](../system/ENGINEERING.md), approved copy and media assignments in [`CONTENT.md`](CONTENT.md), and completion checks in [`ACCEPTANCE.md`](ACCEPTANCE.md). Skills, MCP suggestions, and references may support or critique this direction but may not replace it.
 
 ## Strategic creative core
 

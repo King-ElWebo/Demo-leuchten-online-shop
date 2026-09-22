@@ -2,7 +2,7 @@
 
 Specification status: TEMPLATE_NOT_CONFIGURED
 
-This document defines when the configured showcase is finished. Replace or extend project-specific markers, set concrete viewport values, then change the status to `READY`.
+This document owns the completion and verification criteria for the configured showcase. It verifies the scope, visual direction, and content defined by the other project specifications; it must not silently introduce, expand, or contradict product scope. If a proposed check requires new functionality, first update the owning specification explicitly. Replace or extend project-specific markers, set concrete viewport values, then change the status to `READY`.
 
 The untouched master repository is a special maintenance mode: its intentional `[REQUIRED: replace before production run]` markers and `TEMPLATE_NOT_CONFIGURED` status do not fail `pnpm qa`. A production showcase may not claim completion until all project documents are `READY` and no required markers remain.
 

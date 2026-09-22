@@ -1,5 +1,7 @@
 # Showcase Website Factory Implementation Plan
 
+> **Historical record:** This completed plan explains the original implementation. It is not part of the mandatory runtime reading order; follow [`AGENTS.md`](../../../AGENTS.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Create and verify a lean production master repository for autonomous, visually distinctive showcase websites.

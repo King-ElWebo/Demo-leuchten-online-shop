@@ -1,6 +1,6 @@
 # Engineering contract
 
-This document defines the stable implementation architecture for every showcase. Project scope, visual identity, and content remain authoritative in [`docs/project/`](../project/SITE.md). Package roles and exceptions are defined in [`STACK.md`](STACK.md); autonomous and QA routing is defined in [`TOOLING.md`](TOOLING.md).
+This document defines the stable implementation architecture for every showcase. Domain decisions remain authoritative in the owning project specification: [`SITE.md`](../project/SITE.md) for scope and behavior, [`DESIGN.md`](../project/DESIGN.md) for visual and motion direction, [`CONTENT.md`](../project/CONTENT.md) for copy and content, and [`ACCEPTANCE.md`](../project/ACCEPTANCE.md) for verification without scope expansion. Package roles and exceptions are defined in [`STACK.md`](STACK.md), capability routing in [`TOOLING.md`](TOOLING.md), and autonomous execution order in [`RUNBOOK.md`](RUNBOOK.md).
 
 ## Application architecture
 
