@@ -78,12 +78,12 @@ const requiredDocumentPhrases = [
     [
       'capability preflight',
       'verification-before-completion',
-      'designated OpenDesign owner',
+      'one design-focused workstream may use Stitch',
     ],
   ],
   [
     'docs/system/ANTIGRAVITY.md',
-    ['TOOLING.md#preferred-antigravity-skill-routing'],
+    ['TOOLING.md#preferred-antigravity-skill-routing', 'mcp(stitch/*)'],
   ],
   [
     '.agents/rules/00-showcase-orchestration.md',
@@ -96,23 +96,32 @@ const requiredDocumentPhrases = [
     'README.md',
     [
       '/goal',
-      'Use verified OpenDesign MCP as the primary design creation and iteration environment',
+      'Use verified Stitch MCP when the routing rules require visual exploration',
     ],
   ],
   [
     'docs/project/DESIGN.md',
     [
-      'PRIMARY_DESIGN_PARTNER',
-      'CONCEPT_SPRINT_PRIMARY',
-      'May create temporary OpenDesign projects or artifacts',
-      'OpenDesign required for this project',
+      '## Stitch exploration policy',
+      'Use Stitch for new visual exploration',
+      'Target initial directions',
+      'Required concepts record',
     ],
   ],
   [
     'docs/system/TOOLING.md',
     [
-      '## Skill-guided OpenDesign workflow',
-      'OpenDesign MCP = primary external design creation and iteration workspace',
+      '## Skill-guided Stitch workflow',
+      'Stitch MCP = optional external visual exploration and UI concept surface',
+      'mcp(stitch/*)',
+    ],
+  ],
+  [
+    'concepts/README.md',
+    [
+      'Stitch project ID or link',
+      'Rejected alternatives and reasons',
+      'Implementation deviations',
     ],
   ],
 ];

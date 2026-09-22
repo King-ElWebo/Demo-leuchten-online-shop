@@ -74,26 +74,26 @@ Files under [`docs/superpowers/`](docs/superpowers/README.md) are implementation
 
 ## Direct Build and Concept Sprint
 
-Use **Direct Build** when all four project specifications are complete, consistent, and `READY`. `READY` means the brief and OpenDesign permissions are executable; when `DESIGN.md` selects `PRIMARY_DESIGN_PARTNER`, verified OpenDesign still creates and iterates the direction before frontend implementation. The agent may interpret and refine inside the specified brief but must not expand product scope.
+Use **Direct Build** when all four project specifications are complete, consistent, and `READY`. For a fresh showcase whose Stitch policy permits exploration, verified Stitch normally produces two meaningful visual directions before implementation. For an already approved and sufficiently specified design, Direct Build proceeds without unnecessary concept generation. The agent may interpret and refine inside the specified brief but must not expand product scope.
 
-Use **Concept Sprint** only when visual direction, information architecture, or signature interactions are intentionally unresolved. In `CONCEPT_SPRINT_PRIMARY`, selected design skills guide verified OpenDesign while it creates one to three bounded directions. The chosen decisions must become durable local updates before Direct Build; unused directions do not become competing implementation sources.
+Use **Concept Sprint** only when visual direction, information architecture, or signature interactions are intentionally unresolved. Selected design skills guide verified Stitch toward two purposeful directions, or three for an especially important unresolved project. The chosen decisions must become durable local updates before Direct Build; unused directions do not become competing implementation sources.
 
 ## Natural-language capability intent
 
-Users normally describe the desired outcome rather than list every skill. The agent extracts that intent, discovers and verifies exact capabilities, selects the smallest useful set, reads each selected `SKILL.md`, and applies those instructions while using permitted OpenDesign and later implementation tools. Discovery alone is never reported as skill use. If OpenDesign is unavailable, the fallback in [`TOOLING.md`](docs/system/TOOLING.md#preferred-antigravity-skill-routing) continues locally unless `DESIGN.md` explicitly makes it required.
+Users normally describe the desired outcome rather than list every skill. The agent extracts that intent, discovers and verifies exact capabilities, selects the smallest useful set, reads each selected `SKILL.md`, and applies those instructions while using Stitch only when the routing rules call for visual exploration. Skills provide methods and judgment; Stitch provides an external visual-generation surface. Discovery alone is never reported as skill use. If Stitch is unavailable, the fallback in [`TOOLING.md`](docs/system/TOOLING.md#preferred-antigravity-skill-routing) continues locally without blocking the run.
 
 The generic launch prompts remain in [`RUNBOOK.md`](docs/system/RUNBOOK.md). These examples show how natural-language intent can guide routing without turning the launch prompt into a skill manifest.
 
-### Normal OpenDesign showcase
+### Normal fresh showcase
 
 ```text
 /goal
 
 Execute the complete Showcase Website Factory workflow defined in AGENTS.md for the project in docs/project/.
 
-Use verified OpenDesign MCP as the primary design creation and iteration environment according to the permissions in DESIGN.md. Discover and read the relevant selected design skills first, then apply their instructions while creating, critiquing and refining the design through OpenDesign.
+Use verified Stitch MCP when the routing rules require visual exploration and DESIGN.md permits it. Discover and read the smallest relevant design-skill set first, establish a short design hypothesis, then apply those instructions while creating two meaningful visual directions for a fresh showcase.
 
-Persist the selected direction in DESIGN.md before frontend implementation. Route all additional intent through TOOLING.md and use verified specialist skills during implementation, motion, responsive refinement, accessibility, visual polish and final verification.
+Evaluate and select or synthesize one coherent direction, then persist it in DESIGN.md and the concepts handoff before frontend implementation. Route all additional intent through TOOLING.md and use verified specialist skills during implementation, motion, responsive refinement, accessibility, visual polish and final verification.
 
 Continue autonomously until every applicable acceptance criterion and pnpm qa pass, unless a genuine blocker has no safe fallback.
 ```
@@ -107,9 +107,9 @@ Execute the Showcase Website Factory Teamwork workflow defined in AGENTS.md for 
 
 Project intent: create a hero portfolio piece with an editorial visual direction, advanced but purposeful scroll choreography, refined responsive transformations and an independent final quality review.
 
-During scoping, perform capability preflight and read the relevant selected skills. Create independent workstreams only where useful. Assign one designated owner for verified OpenDesign operations, explicit MCP permissions, fallbacks and durable local handoff artifacts.
+During scoping, perform capability preflight and read the relevant selected skills. Create independent workstreams only where useful. One design-focused workstream may use verified Stitch; assign one designated owner, explicit MCP permissions, fallbacks and durable local handoff artifacts.
 
-Use one shared OpenDesign direction according to DESIGN.md. Do not let separate workers invent competing visual directions. Reconcile and persist the selected direction through the lead before implementation, then reconcile all work again before browser and final QA.
+Converge generated directions into one coherent visual system according to DESIGN.md. Do not let separate workers carry competing visual directions into implementation. Reconcile and persist the selected direction through the lead before implementation, then reconcile all work again before browser and final QA.
 
 Continue until every applicable acceptance criterion and pnpm qa pass.
 ```
@@ -123,6 +123,8 @@ Codex is used to maintain or audit the reusable factory, not normally to produce
 Use `/goal` for a normal three-to-six-page showcase. Reserve `/teamwork-preview` for an unusually large hero project with genuinely independent workstreams such as separate reference and asset research, several complex page families, unusually elaborate motion, or an independent accessibility or performance audit. Antigravity Teamwork may begin with interactive scoping and approval before autonomous execution.
 
 The lead performs capability preflight during scoping. The approved brief assigns each stream a phase, skill, MCP permission, local artifact, and fallback; it must not assume every worker inherits every capability. Every teammate shares the same project specifications, authority hierarchy, and design direction. Reconcile all work through the lead agent before final QA; teammates must not invent competing visual directions independently.
+
+When the project owner wants autonomous Stitch use without repeated MCP approval prompts, Antigravity may be granted the narrow one-time project permission `mcp(stitch/*)`. Do not grant `mcp(*)`, add a duplicate project-local Stitch server, or modify global configuration on the user's behalf.
 
 ## Assets and references
 

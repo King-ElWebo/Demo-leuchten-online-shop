@@ -130,23 +130,18 @@ Store supporting captures in [`references/`](../../references/README.md).
 | ----------------------------------------- | ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |
 | [REQUIRED: replace before production run] | [REQUIRED: replace before production run] | [REQUIRED: replace before production run] | [REQUIRED: replace before production run] |
 
-## External design tooling policy
+## Stitch exploration policy
 
-- **OpenDesign mode (`OFF`, `CRITIQUE_ONLY`, `PRIMARY_DESIGN_PARTNER`, or `CONCEPT_SPRINT_PRIMARY`):** [REQUIRED: replace before production run]
-- **OpenDesign required for this project (`Yes` or `No`):** [REQUIRED: replace before production run]
-- **May create temporary OpenDesign projects or artifacts (`Yes` or `No`):** [REQUIRED: replace before production run]
-- **May generate initial design directions (`Yes` or `No`):** [REQUIRED: replace before production run]
-- **Maximum initial directions (`0` to `3`):** [REQUIRED: replace before production run]
-- **May refine the selected direction (`Yes` or `No`):** [REQUIRED: replace before production run]
-- **May save or update OpenDesign artifacts (`Yes` or `No`):** [REQUIRED: replace before production run]
-- **May export permitted assets locally (`Yes` or `No`):** [REQUIRED: replace before production run]
-- **May publish publicly:** No unless separately authorized
-- **May delete external projects or artifacts:** No unless separately authorized
-- **Required durable local output (`DESIGN.md` decisions, reference notes, permitted assets, and implementation requirements):** [REQUIRED: replace before production run]
+- **Use Stitch for new visual exploration (`Yes` or `No`):** [REQUIRED: replace before production run]
+- **May create or update Stitch projects and screens (`Yes` or `No`):** [REQUIRED: replace before production run]
+- **Target initial directions (`0`, `2`, or `3`):** [REQUIRED: replace before production run]
+- **May use supplied references, screenshots, sketches, or wireframes in Stitch (`Yes` or `No`):** [REQUIRED: replace before production run]
+- **May export permitted visual handoff material locally (`Yes` or `No`):** [REQUIRED: replace before production run]
+- **Required concepts record (project and screen identifiers or links, prompts, selection rationale, implementation notes):** [REQUIRED: replace before production run]
 
-`PRIMARY_DESIGN_PARTNER` is the recommended default for a high-quality portfolio showcase. Choose `OFF` when the project must remain entirely local, `CRITIQUE_ONLY` when an existing direction must not be recreated, and `CONCEPT_SPRINT_PRIMARY` when one to three intentionally distinct directions are authorized. Do not silently override the selected mode.
+For an ordinary fresh portfolio showcase, the recommended values are `Yes`, `Yes`, and `2` initial directions. Use `3` only when the art direction is especially important or genuinely unresolved. Use `0` or select `No` for an already approved and sufficiently specified design, small content changes, fixes, maintenance, or routine refactoring. Directions must differ meaningfully in composition, typography, rhythm, imagery, hierarchy, or interaction model—not merely color.
 
-A harmless capability health check authorizes no creation or write. Once this completed policy is approved and the project is `READY`, it is project-scoped authorization for the listed non-destructive OpenDesign operations. Deletion, public publishing, account changes, and unrelated external mutations always require separate direct authorization. If verified OpenDesign is unavailable, use the documented local fallback unless **OpenDesign required for this project** is `Yes`.
+This policy never makes Stitch a hard dependency. If verified Stitch is unavailable, record the limitation once and continue with selected design skills, project references, local implementation, browser critique, and deterministic QA. Do not store credentials or authentication data in this repository. Public publishing, deletion, account changes, and unrelated external mutations always require separate direct authorization.
 
 ## Explicit anti-patterns
 

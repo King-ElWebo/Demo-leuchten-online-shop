@@ -15,7 +15,7 @@
 - Do not install or vendor skills, configure credentials, add dependencies, redesign the template application, commit, push, deploy, or mutate external services.
 - Preserve template mode and the existing authority hierarchy.
 - Keep `docs/system/TOOLING.md` the only complete skill-routing inventory.
-- OpenDesign remains an optional MCP capability, never a skill.
+- External design-generation surfaces remain optional MCP capabilities, never skills.
 - Prefer one primary skill per phase and one distinct critic where useful.
 
 ---
@@ -48,7 +48,7 @@
 
 - [x] **Step 1: Replace the partial preferred profile with the complete supplied inventory and exact ownership rules.**
 - [x] **Step 2: Add deterministic natural-language intent mapping and motion signals without authorizing GSAP installation.**
-- [x] **Step 3: Preserve OpenDesign as a separately verified optional MCP.**
+- [x] **Step 3: Preserve external design tooling as a separately verified optional MCP capability.**
 
 ### Task 3: Wire routing into orchestration and runtime documents
 

@@ -31,7 +31,7 @@ Files under [`docs/superpowers/`](docs/superpowers/README.md) are implementation
 - **Repository rules** are the permanent constraints in `.agents/rules/`. They apply throughout every run and are not optional skills that need activation.
 - **Skills** are discoverable instruction packages that provide expertise and working methods. They provide no external access, never outrank project specifications, and are available only when the current agent can discover and read them.
 - **MCP servers and external tools** provide optional external data, tools, or interactive capabilities. They are not skills, npm packages, or runtime dependencies of the finished website.
-- **OpenDesign MCP** is the preferred external design creation and iteration workspace when verified and permitted by `DESIGN.md`. Selected skills guide how Antigravity uses it; OpenDesign does not invoke those skills and never replaces `DESIGN.md` as durable authority.
+- **Stitch MCP** is the preferred optional visual exploration and UI concept surface for qualifying fresh showcase work. Selected skills guide how Antigravity uses it; Stitch does not invoke those skills, own application architecture, or replace project documents as durable authority.
 - **Local tooling** is the repository-owned deterministic baseline: Prettier, the documentation checker, ESLint, TypeScript, Playwright with axe, and the production build.
 
 Resolve every conflict in this order:
@@ -48,7 +48,7 @@ Apply domain ownership rather than averaging conflicting documents. `SITE.md` de
 
 ## Readiness gate
 
-Direct Build requires all four project specifications to say `Specification status: READY`, contain no `[REQUIRED: replace before production run]` markers, and be mutually consistent. `READY` means the brief, direction, and external-tool permissions are ready for execution; it does not mean an authorized `PRIMARY_DESIGN_PARTNER` OpenDesign phase should be skipped. Report a genuinely required missing decision instead of inventing it. Resolve minor implementation details coherently without pausing.
+Direct Build requires all four project specifications to say `Specification status: READY`, contain no `[REQUIRED: replace before production run]` markers, and be mutually consistent. `READY` means the brief, direction, and optional visual-exploration policy are ready for execution. For a fresh showcase, follow the Stitch routing in `TOOLING.md`; for an already approved and sufficiently specified design, do not reopen visual exploration without reason. Report a genuinely required missing decision instead of inventing it. Resolve minor implementation details coherently without pausing.
 
 Use Concept Sprint only when visual direction, information architecture, or signature interactions are intentionally unresolved. It must update, or propose explicit updates to, the owning project documents before the final Direct Build. A normal `/goal` must not quietly become an uncontrolled redesign.
 
@@ -64,13 +64,13 @@ After the readiness review and before either execution mode, perform a short Ant
 4. Map user intent and project needs through the canonical [preferred Antigravity skill routing in `TOOLING.md`](docs/system/TOOLING.md#preferred-antigravity-skill-routing).
 5. Classify relevant capabilities as `SELECTED_VERIFIED`, `AVAILABLE_NOT_SELECTED`, `UNAVAILABLE`, `FALLBACK_ACTIVE`, or `BLOCKED_REQUIRED`.
 6. Select the smallest useful set, normally one primary skill per phase and at most one genuinely distinct critic where valuable.
-7. Apply the `DESIGN.md` OpenDesign mode: select and use verified OpenDesign for permitted `PRIMARY_DESIGN_PARTNER` or `CONCEPT_SPRINT_PRIMARY` work, bound it to critique for `CRITIQUE_ONLY`, and do not use it for `OFF`.
+7. Apply the Stitch routing and the project policy in `DESIGN.md`: prefer verified Stitch for qualifying fresh visual exploration, skip it for implementation-only work or an explicit opt-out, and never make it a completion dependency.
 8. Assign the documented local fallback for every unavailable or unverified optional capability.
 9. Continue autonomously unless a genuinely required capability is `BLOCKED_REQUIRED` because it has no safe fallback.
 
 A skill is `SELECTED_VERIFIED` only when Antigravity discovered it, its exact name or package is known, its `SKILL.md` is readable, and its instructions are relevant to the current phase. Assign each selected skill to exactly one primary phase or one bounded specialist role, then actually invoke or follow it during that phase. Do not select overlapping skills as competing creative directors or claim a skill was used because it was merely discovered. A skill never overrides direct user instructions or `SITE.md`, `DESIGN.md`, `CONTENT.md`, or `ACCEPTANCE.md`.
 
-An MCP capability is `SELECTED_VERIFIED` only when its server is installed and enabled, its tools are visible, and a harmless read-only health or discovery call succeeds. Never use generation, writes, project creation, deletion, publishing, or another mutation as a health check. If no safe read-only probe exists, keep the capability available but unverified and use the local fallback. For OpenDesign, the completed project policy in `DESIGN.md` authorizes only its explicitly listed non-destructive operations after verification; it does not make the health check itself mutating.
+An MCP capability is `SELECTED_VERIFIED` only when its server is installed and enabled, its tools are visible, and a harmless read-only health or discovery call succeeds. Never use generation, writes, project creation, deletion, publishing, or another mutation as a health check. If no safe read-only probe exists, keep the capability available but unverified and use the local fallback. Stitch failure is always non-blocking: record it once, avoid repeated identical retries, and continue through the documented skills-based local workflow.
 
 Do not hardcode machine-specific skill locations or assume a familiar product or package name exists. Use selected capabilities in their assigned phases rather than merely listing them. A concise preflight report is sufficient:
 
@@ -79,7 +79,7 @@ Antigravity capability preflight
 
 SELECTED_VERIFIED
 - <phase: exact readable skill or safely probed MCP capability>
-- <design workspace: verified OpenDesign under the DESIGN.md mode, or none>
+- <visual exploration: verified Stitch when routed, or local fallback>
 
 AVAILABLE_NOT_SELECTED
 - <available capability and why it is not needed>
@@ -106,9 +106,9 @@ Follow the full operational sequence in [`docs/system/RUNBOOK.md`](docs/system/R
 2. Validate readiness and consistency.
 3. Run capability preflight.
 4. Read the smallest relevant design-skill bundle, then choose Direct Build or Concept Sprint.
-5. Plan routes, architecture, content, assets, tests, evidence, and permitted OpenDesign operations.
-6. When selected by `DESIGN.md`, apply the verified skills while using OpenDesign to create, critique, and refine one shared direction.
-7. Persist the selected design decisions and permitted local artifacts before frontend implementation.
+5. Plan routes, architecture, content, assets, tests, evidence, and a short design hypothesis.
+6. For qualifying fresh visual exploration, apply the verified skills while using Stitch to create two meaningfully distinct directions; use three only when justified.
+7. Evaluate, select or synthesize, then persist the selected design decisions and the required `concepts/` handoff before frontend implementation.
 8. Implement the specified scope and complete React quality review.
 9. Complete a dedicated motion implementation and polish pass.
 10. Complete responsive and accessibility refinement.
@@ -121,7 +121,7 @@ Follow the full operational sequence in [`docs/system/RUNBOOK.md`](docs/system/R
 
 Skills provide phase-specific expertise. MCP tools provide optional external capabilities. Both feed durable local implementation and evidence; neither determines scope or completion. Missing optional capabilities never block work when the fallback in `TOOLING.md` is safe.
 
-The default phase ownership is: current user intent plus project specifications → discover and read the smallest relevant design-skill bundle → apply those skills while verified OpenDesign creates the permitted design direction → bounded critic review and OpenDesign refinement → durable `DESIGN.md` handoff → `frontend-design` implementation → React quality review → `emil-design-eng` motion direction with bounded transition specialists → responsive, accessibility, and visual QA → `verification-before-completion` → Antigravity browser verification → Playwright and axe → one final `pnpm qa`. Every name is a preferred candidate, not an installation claim. Exact ownership, OpenDesign modes, conflicts, permissions, and fallbacks live only in `TOOLING.md` and the project policy in `DESIGN.md`.
+The default phase ownership for a fresh showcase is: current user intent plus project specifications → discover and read the smallest relevant design-skill bundle → establish a design hypothesis → use verified Stitch for two meaningful visual directions when routing and `DESIGN.md` permit → critic evaluation and bounded synthesis → durable `DESIGN.md` plus `concepts/` handoff → `frontend-design` implementation → React quality review → `emil-design-eng` motion direction with bounded transition specialists → responsive, accessibility, and visual QA → `verification-before-completion` → Antigravity browser verification → Playwright and axe → one final `pnpm qa`. Every name is a preferred candidate, not an installation claim. Exact skill, Stitch, MCP, permission, conflict, and fallback routing lives in `TOOLING.md` and the project policy in `DESIGN.md`.
 
 ## Permanent implementation constraints
 
@@ -137,7 +137,7 @@ The default phase ownership is: current user intent plus project specifications 
 
 ## External mutation restrictions
 
-Repository inspection and approved local implementation are allowed. A completed and approved external-design-tooling policy in `DESIGN.md` is project-scoped authorization for exactly its listed non-destructive OpenDesign creation, refinement, saving, updating, and export operations after capability verification. It does not authorize deletion, public publishing, account changes, or unrelated external mutations; those always require separate direct authorization. Do not commit, push, open or modify issues or pull requests, deploy, or mutate other external services without direct user authorization. Figma, GitHub, Vercel, image, and browser MCP access never implies mutation permission.
+Repository inspection and approved local implementation are allowed. If the Antigravity project owner grants the optional `mcp(stitch/*)` permission, verified Stitch tools may be used autonomously only for the project-relevant exploration and handoff described in `DESIGN.md` and `TOOLING.md`; never broaden that permission to `mcp(*)`. It does not authorize deletion, public publishing, account changes, or unrelated external mutations. Do not commit, push, open or modify issues or pull requests, deploy, or mutate other external services without direct user authorization. Figma, GitHub, Vercel, image, and browser MCP access never implies mutation permission.
 
 ## Final completion gate
 

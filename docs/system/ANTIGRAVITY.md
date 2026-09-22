@@ -14,14 +14,14 @@ See Google's official [slash-command overview](https://antigravity.google/docs/s
 
 ## Official workspace conventions
 
-| Capability                    | Antigravity location                                       | Repository policy                                                                                                         |
-| ----------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Workspace rules               | `.agents/rules/*.md`                                       | Permanent repository constraints; the bootstrap rule directs showcase work to `AGENTS.md`.                                |
-| Workspace skills              | `.agents/skills/<skill-folder>/SKILL.md`                   | Commit only small, generic, repository-owned skills. This repository currently installs no third-party workspace skill.   |
-| Antigravity 2.0 global skills | `~/.gemini/config/skills/<skill-folder>/SKILL.md`          | Discover at runtime; never hardcode or copy a workstation installation into the repository.                               |
-| Antigravity CLI global skills | `~/.gemini/antigravity-cli/skills/<skill-folder>/SKILL.md` | Surface-specific alternative when the CLI is used.                                                                        |
-| Workspace MCP configuration   | `.agents/mcp_config.json`                                  | Create only for a deliberate project-local integration. Do not commit credentials or machine-specific executable paths.   |
-| Global MCP configuration      | `~/.gemini/config/mcp_config.json`                         | Preferred location for reusable OpenDesign setup across copied showcase repositories. It remains outside this repository. |
+| Capability                    | Antigravity location                                       | Repository policy                                                                                                          |
+| ----------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Workspace rules               | `.agents/rules/*.md`                                       | Permanent repository constraints; the bootstrap rule directs showcase work to `AGENTS.md`.                                 |
+| Workspace skills              | `.agents/skills/<skill-folder>/SKILL.md`                   | Commit only small, generic, repository-owned skills. This repository currently installs no third-party workspace skill.    |
+| Antigravity 2.0 global skills | `~/.gemini/config/skills/<skill-folder>/SKILL.md`          | Discover at runtime; never hardcode or copy a workstation installation into the repository.                                |
+| Antigravity CLI global skills | `~/.gemini/antigravity-cli/skills/<skill-folder>/SKILL.md` | Surface-specific alternative when the CLI is used.                                                                         |
+| Workspace MCP configuration   | `.agents/mcp_config.json`                                  | Create only for a deliberate project-local integration. Do not commit credentials or machine-specific executable paths.    |
+| Global MCP configuration      | `~/.gemini/config/mcp_config.json`                         | Preferred location for reusable Stitch connection across copied showcase repositories. It remains outside this repository. |
 
 These paths follow Google's official [Rules](https://antigravity.google/docs/rules-workflows/), [Agent Skills](https://antigravity.google/docs/skills/), and [MCP](https://antigravity.google/docs/mcp/) documentation.
 
@@ -33,7 +33,7 @@ Antigravity may discover skills from the workspace, supported global locations, 
 
 Antigravity discovers skill names and descriptions automatically, then reads the full `SKILL.md` only when the skill is relevant or explicitly invoked. Discovery alone is not verification. A selected skill is usable only after the preflight confirms its exact name, readable instructions, and phase relevance, and the agent must actually follow those instructions in the assigned phase. `/goal` and `/teamwork-preview` do not install missing skills.
 
-MCP tools become available after a server is installed, enabled, connected, and exposes them to the model. Availability does not force invocation; the model still selects tools according to the project phase, permissions, and `TOOLING.md`. OpenDesign remains a separately discovered and verified MCP capability, never a skill. When `DESIGN.md` selects `PRIMARY_DESIGN_PARTNER` or `CONCEPT_SPRINT_PRIMARY`, verified OpenDesign is the preferred design workspace; selected skills must be read first and guide how Antigravity uses it.
+MCP tools become available after a server is installed, enabled, connected, and exposes them to the model. Availability does not force invocation; the model still selects tools according to the project phase, permissions, and `TOOLING.md`. Stitch remains a separately discovered and verified MCP capability, never a skill. The intended Antigravity environment names the global server `stitch`, but every run must still verify the tools it can actually see. Selected skills must be read first and guide how Antigravity uses Stitch.
 
 The preflight reports every relevant capability as one of:
 
@@ -45,18 +45,19 @@ The preflight reports every relevant capability as one of:
 
 An MCP reaches `SELECTED_VERIFIED` only after a harmless read-only health or discovery call succeeds. If no safe probe exists, keep it available but unverified, activate the local fallback, and wait for a real authorized use. Never generate, write, create, save, update, delete, publish, or deploy merely to test availability.
 
-## OpenDesign policy
+## Stitch runtime policy
 
-OpenDesign is the preferred primary design creation and iteration environment when its [official upstream Antigravity integration](https://github.com/nexu-io/open-design) is installed globally, verified by a harmless read-only probe, permitted by `DESIGN.md`, and not disabled by the user. It remains technically optional so copied repositories can finish through a local fallback.
+Stitch is the preferred optional visual exploration and UI concept tool for a fresh showcase when runtime verification succeeds, `DESIGN.md` permits exploration, the routing in `TOOLING.md` calls for it, and the user has not disabled it. It can generate initial screens, meaningful visual variants, layout directions, and handoff material. It does not decide product scope, application architecture, final production code, accessibility, responsive behavior, or completion.
 
-- `OFF`: do not use OpenDesign.
-- `CRITIQUE_ONLY`: use it only for permitted focused critique or validation; do not create a new direction.
-- `PRIMARY_DESIGN_PARTNER`: the recommended normal portfolio-showcase mode. Read the selected design skills first, apply them while OpenDesign creates and iterates the direction, then persist the result before code.
-- `CONCEPT_SPRINT_PRIMARY`: use OpenDesign for one to three skill-guided directions when art direction is intentionally unresolved; keep only the selected direction as implementation authority.
+The optional one-time Antigravity project permission is:
 
-A health check never authorizes creation or writes. A completed and approved `DESIGN.md` policy authorizes exactly its listed non-destructive OpenDesign operations for that project. Deletion, public publishing, account changes, and unrelated external mutations still require separate direct authorization. Persist selected decisions in `DESIGN.md`, local reference notes, permitted local assets, and implementation requirements; temporary MCP output is not a source of truth.
+```text
+mcp(stitch/*)
+```
 
-If OpenDesign cannot be verified, report the fallback and continue with project specifications, supplied references, selected verified design skills, local implementation, browser critique, and deterministic QA. Block only when `DESIGN.md` explicitly makes OpenDesign required and rejects fallback.
+Granting this through Antigravity permits autonomous calls to the `stitch` server without repeated MCP approval prompts. Never broaden it to `mcp(*)`, grant unrelated servers, write it into a global configuration on the user's behalf, or place credentials in this repository. A project-local Stitch entry is unnecessary when the global server is already connected.
+
+If Stitch is unavailable, unauthenticated, or returns an error, record the limitation once, do not repeatedly retry the same failing call, and continue through project specifications, supplied references, selected verified design skills, local frontend implementation, browser critique, and deterministic QA. Stitch is never `BLOCKED_REQUIRED` in this factory.
 
 ## Browser and deterministic QA
 
@@ -81,7 +82,7 @@ Perform an Antigravity runtime-readiness audit for this Showcase Website Factory
 
 Read AGENTS.md and the referenced system files. Discover all available workspace, global and plugin-provided skills. Confirm the exact readable skill packages relevant to design, motion, visual refinement, accessibility, responsive design, Next.js, React and browser QA.
 
-Discover installed and enabled MCP servers. Perform only harmless read-only probes for selected servers. In particular, report whether the official OpenDesign MCP is visible and reachable without generating, saving, updating or deleting anything.
+Discover installed and enabled MCP servers. Perform only harmless read-only probes for selected servers. In particular, report whether the global server named stitch exposes reachable tools without generating, saving, updating or deleting anything.
 
 Report capabilities as SELECTED_VERIFIED, AVAILABLE_NOT_SELECTED, UNAVAILABLE, FALLBACK_ACTIVE or BLOCKED_REQUIRED. End with the exact recommended capability set for normal /goal showcase runs and for a Concept Sprint. Do not install, configure or mutate anything.
 ```
