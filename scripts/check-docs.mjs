@@ -13,6 +13,9 @@ const requiredFiles = [
   'docs/system/STACK.md',
   'docs/system/TOOLING.md',
   'docs/system/RUNBOOK.md',
+  'docs/system/ANTIGRAVITY.md',
+  '.agents/skills/README.md',
+  '.agents/rules/00-showcase-orchestration.md',
   '.agents/rules/code-quality.md',
   '.agents/rules/design-quality.md',
   '.agents/rules/responsive-accessibility.md',
@@ -63,8 +66,29 @@ for (const relativePath of requiredFiles) {
 const agentsPath = path.join(root, 'AGENTS.md');
 if (await exists(agentsPath)) {
   const agentsContent = await readFile(agentsPath, 'utf8');
-  if (!agentsContent.includes('docs/system/RUNBOOK.md')) {
-    failures.push('AGENTS.md does not reference docs/system/RUNBOOK.md.');
+  const requiredAgentReferences = [
+    'docs/system/RUNBOOK.md',
+    'docs/system/ANTIGRAVITY.md',
+    '.agents/rules/00-showcase-orchestration.md',
+  ];
+
+  for (const reference of requiredAgentReferences) {
+    if (!agentsContent.includes(reference)) {
+      failures.push(`AGENTS.md does not reference ${reference}.`);
+    }
+  }
+}
+
+const readmePath = path.join(root, 'README.md');
+if (await exists(readmePath)) {
+  const readmeContent = await readFile(readmePath, 'utf8');
+  if (
+    !readmeContent.includes('/goal') ||
+    !readmeContent.includes(
+      'Execute the complete Antigravity-first Showcase Website Factory Direct Build',
+    )
+  ) {
+    failures.push('README.md does not expose the Antigravity /goal prompt.');
   }
 }
 

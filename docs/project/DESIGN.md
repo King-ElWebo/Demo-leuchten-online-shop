@@ -130,6 +130,15 @@ Store supporting captures in [`references/`](../../references/README.md).
 | ----------------------------------------- | ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |
 | [REQUIRED: replace before production run] | [REQUIRED: replace before production run] | [REQUIRED: replace before production run] | [REQUIRED: replace before production run] |
 
+## External design tooling policy
+
+- **OpenDesign mode (`OFF`, `CRITIQUE_ONLY`, or `CONCEPT_SPRINT_ALLOWED`):** [REQUIRED: replace before production run]
+- **Maximum generated directions (`0` for `OFF` or `CRITIQUE_ONLY`; otherwise `1` to `3`):** [REQUIRED: replace before production run]
+- **External project or artifact writes and their exact boundary:** [REQUIRED: replace before production run]
+- **Required durable local output (`DESIGN.md` decisions, reference notes, permitted assets, and implementation requirements):** [REQUIRED: replace before production run]
+
+Recommended defaults are `OFF` or `CRITIQUE_ONLY` for a normal showcase and `CONCEPT_SPRINT_ALLOWED` only for a hero showcase or intentionally unresolved direction. A capability health check does not authorize design generation or external writes. Destructive deletion and public publishing are prohibited unless the user directly authorizes the exact action.
+
 ## Explicit anti-patterns
 
 - Generic SaaS composition

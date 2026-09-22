@@ -1,6 +1,6 @@
 # Agent constitution
 
-This repository is a reusable production system for project-specific showcase websites. Project specifications define what to build; this file orchestrates the run; repository contracts and rules constrain it; discovered skills and MCP tools add optional expertise or access; local tooling supplies deterministic evidence.
+This repository is a reusable production system for project-specific showcase websites. Google Antigravity is the primary production runtime; Codex is used primarily to maintain and audit this base repository. Project specifications define what to build; this file orchestrates the run; repository contracts and rules constrain it; discovered skills and MCP tools add optional expertise or access; local tooling supplies deterministic evidence.
 
 ## Required reading order
 
@@ -12,14 +12,16 @@ Before planning or implementation, read these exact files in order:
 4. [`docs/project/ACCEPTANCE.md`](docs/project/ACCEPTANCE.md)
 5. [`docs/system/ENGINEERING.md`](docs/system/ENGINEERING.md)
 6. [`docs/system/STACK.md`](docs/system/STACK.md)
-7. [`docs/system/TOOLING.md`](docs/system/TOOLING.md)
-8. [`docs/system/RUNBOOK.md`](docs/system/RUNBOOK.md)
-9. [`.agents/skills/README.md`](.agents/skills/README.md)
-10. [`.agents/rules/code-quality.md`](.agents/rules/code-quality.md)
-11. [`.agents/rules/design-quality.md`](.agents/rules/design-quality.md)
-12. [`.agents/rules/responsive-accessibility.md`](.agents/rules/responsive-accessibility.md)
-13. [`.agents/rules/motion-quality.md`](.agents/rules/motion-quality.md)
-14. [`.agents/rules/qa-completion.md`](.agents/rules/qa-completion.md)
+7. [`docs/system/ANTIGRAVITY.md`](docs/system/ANTIGRAVITY.md)
+8. [`docs/system/TOOLING.md`](docs/system/TOOLING.md)
+9. [`docs/system/RUNBOOK.md`](docs/system/RUNBOOK.md)
+10. [`.agents/skills/README.md`](.agents/skills/README.md)
+11. [`.agents/rules/00-showcase-orchestration.md`](.agents/rules/00-showcase-orchestration.md)
+12. [`.agents/rules/code-quality.md`](.agents/rules/code-quality.md)
+13. [`.agents/rules/design-quality.md`](.agents/rules/design-quality.md)
+14. [`.agents/rules/responsive-accessibility.md`](.agents/rules/responsive-accessibility.md)
+15. [`.agents/rules/motion-quality.md`](.agents/rules/motion-quality.md)
+16. [`.agents/rules/qa-completion.md`](.agents/rules/qa-completion.md)
 
 Files under [`docs/superpowers/`](docs/superpowers/README.md) are implementation history, not current runtime authority, and are not part of this required reading order.
 
@@ -53,31 +55,44 @@ Use Concept Sprint only when visual direction, information architecture, or sign
 
 ## Mandatory capability preflight
 
-After the readiness review and before either execution mode, perform a short preflight:
+After the readiness review and before either execution mode, perform a short Antigravity capability preflight:
 
 1. Inspect the current environment for available skills.
 2. Inspect the current environment for available MCP servers and tools.
 3. Match discovered capabilities to the logical capabilities required by this project.
-4. Select the smallest useful set, normally one primary skill per phase and at most one distinct critic where valuable.
-5. Identify unavailable optional capabilities.
-6. Assign the documented local fallback for every unavailable optional capability.
-7. Continue autonomously unless a genuinely required capability has no safe fallback.
+4. Classify relevant capabilities as `SELECTED_VERIFIED`, `AVAILABLE_NOT_SELECTED`, `UNAVAILABLE`, `FALLBACK_ACTIVE`, or `BLOCKED_REQUIRED`.
+5. Select the smallest useful set, normally one primary skill per phase and at most one distinct critic where valuable.
+6. Assign the documented local fallback for every unavailable or unverified optional capability.
+7. Continue autonomously unless a genuinely required capability is `BLOCKED_REQUIRED` because it has no safe fallback.
 
-Do not hardcode machine-specific skill locations or assume a familiar product or package name exists. A concise preflight report is sufficient:
+A skill is `SELECTED_VERIFIED` only when Antigravity discovered it, its exact name or package is known, its `SKILL.md` is readable, and its instructions are relevant to the current phase. An MCP capability is `SELECTED_VERIFIED` only when its server is installed and enabled, its tools are visible, and a harmless read-only health or discovery call succeeds. Never use generation, writes, project creation, deletion, publishing, or another mutation as a health check. If no safe read-only probe exists, keep the capability available but unverified, use the local fallback, and verify it only through a later authorized real use.
+
+Do not hardcode machine-specific skill locations or assume a familiar product or package name exists. Use selected capabilities in their assigned phases rather than merely listing them. A concise preflight report is sufficient:
 
 ```text
-Selected skills: <discovered capability and exact readable package>
-Selected external tools: <discovered MCP/tool or none>
-Local baseline: Playwright + axe, ESLint, TypeScript, Prettier, docs check, build
-Unavailable optional capabilities: <capability or none>
-Fallbacks: <local implementation or review method>
+Antigravity capability preflight
+
+SELECTED_VERIFIED
+- <phase: exact readable skill or safely probed MCP capability>
+
+AVAILABLE_NOT_SELECTED
+- <available capability and why it is not needed>
+
+UNAVAILABLE
+- <optional capability or none>
+
+FALLBACK_ACTIVE
+- <capability: local method>
+
+BLOCKED_REQUIRED
+- none
 ```
 
-The logical capability matrix, MCP permissions, and fallbacks are defined in [`docs/system/TOOLING.md`](docs/system/TOOLING.md).
+Antigravity-specific discovery and configuration boundaries are defined in [`docs/system/ANTIGRAVITY.md`](docs/system/ANTIGRAVITY.md). The logical capability matrix, MCP permissions, and fallbacks are defined in [`docs/system/TOOLING.md`](docs/system/TOOLING.md).
 
 ## Execution routing and loop
 
-Use `/goal` for a normal three-to-six-page showcase. Use `/teamwork-preview` only for genuinely independent workstreams. Every teammate follows this file, the same project specifications, and the same authority hierarchy; the lead agent owns reconciliation and final QA.
+In Antigravity, use `/goal` for a normal three-to-six-page showcase. Reserve `/teamwork-preview` for unusually large hero projects with genuinely independent workstreams. Its lead agent performs the capability preflight during initial scoping, records capability, permission, fallback, and local-artifact ownership per workstream, and does not assume every worker inherits every skill or MCP tool. Every teammate follows this file, the same project specifications, and the same authority hierarchy; the lead owns reconciliation and final QA.
 
 Follow the full operational sequence in [`docs/system/RUNBOOK.md`](docs/system/RUNBOOK.md):
 
@@ -98,6 +113,8 @@ Follow the full operational sequence in [`docs/system/RUNBOOK.md`](docs/system/R
 15. Produce an evidence-based completion report.
 
 Skills provide phase-specific expertise. MCP tools provide optional external capabilities. Both feed durable local implementation and evidence; neither determines scope or completion. Missing optional capabilities never block work when the fallback in `TOOLING.md` is safe.
+
+The default phase ownership is: project specifications → a verified design-intelligence skill (prefer `ui-ux-pro-max` when actually discovered) → optional verified OpenDesign during an authorized Concept Sprint → selected decisions written to `DESIGN.md` → Next.js/React implementation → a verified Emil motion skill when available → responsive and accessibility refinement → a verified Impeccable-style final critique when available → Antigravity browser verification → mandatory Playwright and axe evidence → `pnpm qa`. These names are preferred candidates, not installation claims. UI/UX skills do not own final direction, OpenDesign never remains a parallel source of truth, motion skills do not increase density beyond `DESIGN.md`, browser tools supply observations rather than design authority, and Playwright supplies deterministic evidence rather than aesthetic judgment.
 
 ## Permanent implementation constraints
 

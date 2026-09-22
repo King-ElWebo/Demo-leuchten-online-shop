@@ -1,6 +1,6 @@
 # Showcase Website Factory
 
-A lean production master for distinctive, high-end portfolio and showcase websites. Copy it, complete four project specifications, add approved assets, and start one short prompt. The agent then plans, implements, inspects, refines, tests, and validates the website against an explicit completion contract.
+A lean production master for distinctive, high-end portfolio and showcase websites. Google Antigravity is the primary showcase-production runtime; Codex is used primarily to maintain and audit this reusable base. Copy it, complete four project specifications, add approved assets, and start one short Antigravity prompt. The agent then plans, implements, inspects, refines, tests, and validates the website against an explicit completion contract.
 
 > **Reuse infrastructure and behavior. Recreate visual identity per project.**
 
@@ -26,7 +26,7 @@ flowchart TD
     Q --> P
 ```
 
-[`AGENTS.md`](AGENTS.md) is the definitive orchestrator. [`RUNBOOK.md`](docs/system/RUNBOOK.md) defines the autonomous phase order. [`TOOLING.md`](docs/system/TOOLING.md) routes capabilities and fallbacks.
+[`AGENTS.md`](AGENTS.md) is the definitive orchestrator. [`ANTIGRAVITY.md`](docs/system/ANTIGRAVITY.md) defines the primary runtime contract. [`RUNBOOK.md`](docs/system/RUNBOOK.md) defines the autonomous phase order. [`TOOLING.md`](docs/system/TOOLING.md) routes capabilities and fallbacks.
 
 ## Precise terminology
 
@@ -48,6 +48,7 @@ Authority is resolved in this order: direct user instructions; the relevant proj
 | Completion and verification, without product-scope expansion                       | [`ACCEPTANCE.md`](docs/project/ACCEPTANCE.md)                         |
 | Architecture, data flow, accessibility, performance, and code quality              | [`ENGINEERING.md`](docs/system/ENGINEERING.md)                        |
 | Default, opt-in, and excluded technology                                           | [`STACK.md`](docs/system/STACK.md) and [`package.json`](package.json) |
+| Antigravity runtime, discovery, configuration boundaries, and readiness audit      | [`ANTIGRAVITY.md`](docs/system/ANTIGRAVITY.md)                        |
 | Skill discovery, MCP routing, fallbacks, commands, and evidence                    | [`TOOLING.md`](docs/system/TOOLING.md)                                |
 | Autonomous phase order, execution modes, entry points, and launch prompts          | [`RUNBOOK.md`](docs/system/RUNBOOK.md)                                |
 | Reading order, authority hierarchy, preflight, restrictions, and completion gate   | [`AGENTS.md`](AGENTS.md)                                              |
@@ -67,7 +68,7 @@ Files under [`docs/superpowers/`](docs/superpowers/README.md) are implementation
    4. [`ACCEPTANCE.md`](docs/project/ACCEPTANCE.md)
 4. Remove every `[REQUIRED: replace before production run]` marker and set all four specifications to `READY`.
 5. Add stable production media under [`public/media/`](public/media/README.md), reference notes under [`references/`](references/README.md), and only deliberately bounded concept work under [`concepts/`](concepts/README.md).
-6. Start the appropriate prompt below. The agent follows `AGENTS.md`, performs its capability preflight, selects the smallest useful discovered capability set, and continues through `pnpm qa`.
+6. Start the normal Antigravity `/goal` prompt below. The workspace bootstrap rule leads Antigravity to `AGENTS.md`; the agent performs capability preflight, uses the smallest useful verified capability set in its assigned phases, and continues through `pnpm qa`.
 
 `TEMPLATE_NOT_CONFIGURED` is intentional in the untouched factory and does not fail the base repository's QA. A configured production project may not retain required markers.
 
@@ -75,7 +76,7 @@ Files under [`docs/superpowers/`](docs/superpowers/README.md) are implementation
 
 Use **Direct Build** when all four project specifications are complete, consistent, and `READY`. The agent may interpret and refine inside the specified direction but must not replace it.
 
-Use **Concept Sprint** only when visual direction, information architecture, or signature interactions are intentionally unresolved. It may use discovered design skills and optional design MCP tools to compare a small number of bounded options. The selected decisions must update, or be proposed as explicit updates to, the owning project specifications before final Direct Build begins. A normal `/goal` must not quietly become an uncontrolled redesign.
+Use **Concept Sprint** only when visual direction, information architecture, or signature interactions are intentionally unresolved. When the policy in `DESIGN.md` permits it, the sprint may use discovered design skills and the optional official OpenDesign MCP to compare one to three bounded options. The selected decisions must become durable local updates to the owning project specifications before final Direct Build begins. A normal `/goal` must not quietly become an uncontrolled redesign.
 
 ## Reusable run prompts
 
@@ -86,11 +87,11 @@ These prompts are also stored in [`RUNBOOK.md`](docs/system/RUNBOOK.md).
 ```text
 /goal
 
-Execute the complete Showcase Website Factory Direct Build defined in AGENTS.md.
+Execute the complete Antigravity-first Showcase Website Factory Direct Build defined in AGENTS.md for the project in docs/project/.
 
-Read and follow all referenced project and system documents. Perform the capability preflight, then continue autonomously through planning, implementation, motion, responsive refinement, accessibility, browser and visual QA, bug fixing and final validation.
+Perform the mandatory capability preflight. Use the selected verified skills and MCP tools in their assigned phases; do not merely list them. Continue autonomously through implementation, motion, responsive refinement, accessibility, visual critique, browser verification, corrective iteration and final validation.
 
-Do not stop until the project acceptance criteria pass and pnpm qa succeeds, unless a genuine blocker requires user input.
+Do not stop until every applicable acceptance criterion passes and pnpm qa succeeds, unless a genuine blocker has no safe fallback.
 ```
 
 ### Antigravity Teamwork run
@@ -98,28 +99,22 @@ Do not stop until the project acceptance criteria pass and pnpm qa succeeds, unl
 ```text
 /teamwork-preview
 
-Execute the complete Showcase Website Factory workflow defined in AGENTS.md.
+Execute the Antigravity-first Showcase Website Factory workflow defined in AGENTS.md.
 
-Use teamwork only for genuinely independent workstreams. Ensure every agent follows the same project specifications, authority hierarchy and design direction. Reconcile all work through the lead agent.
+During scoping, read the complete project specification and perform the capability preflight. Create independent workstreams only where they provide real value. Assign clear skill, MCP, permission, fallback and artifact ownership to each workstream.
 
-Continue through implementation, motion, responsive refinement, accessibility, browser and visual QA, bug fixing and final validation. Do not stop until the project acceptance criteria pass and pnpm qa succeeds, unless a genuine blocker requires user input.
+Keep one shared visual direction and reconcile all results through the lead agent. Continue through implementation, motion, responsive refinement, accessibility, visual critique, browser verification and final validation until every applicable acceptance criterion and pnpm qa pass.
 ```
 
-### Codex or another agent without slash commands
+## Base repository maintenance
 
-```text
-Execute the complete Showcase Website Factory Direct Build defined in AGENTS.md for the project in docs/project/.
-
-Perform the capability preflight and continue autonomously until all acceptance criteria pass and pnpm qa succeeds. Do not commit, push or deploy.
-```
-
-Antigravity may support the two slash commands. Codex and other agents without them should receive the equivalent text as a normal task prompt. Claude-compatible environments may use [`CLAUDE.md`](CLAUDE.md) as a bridge where that convention is supported; do not assume automatic loading. Every entry point must ultimately instruct the agent to follow `AGENTS.md`.
+Codex is used to maintain or audit the reusable factory, not normally to produce copied showcase websites. A Codex maintenance prompt should explicitly require following `AGENTS.md`, preserving template-mode behavior where applicable, running the local completion gate, and avoiding commits, pushes, or deployments unless separately authorized. Claude-compatible environments may use [`CLAUDE.md`](CLAUDE.md) as a bridge where that convention is supported; do not assume automatic loading. Every entry point must ultimately instruct the agent to follow `AGENTS.md`.
 
 ## When Teamwork is appropriate
 
-Use `/goal` for a normal three-to-six-page showcase. Reserve `/teamwork-preview` for genuinely independent workstreams such as separate reference and asset research, several complex page families, unusually elaborate motion, an independent accessibility or performance audit, or a major hero portfolio piece.
+Use `/goal` for a normal three-to-six-page showcase. Reserve `/teamwork-preview` for an unusually large hero project with genuinely independent workstreams such as separate reference and asset research, several complex page families, unusually elaborate motion, or an independent accessibility or performance audit. Antigravity Teamwork may begin with interactive scoping and approval before autonomous execution.
 
-Every teammate must share the same project specifications, authority hierarchy, and design direction. Give streams clear ownership and reconcile all work through the lead agent before final QA; teammates must not invent competing visual directions independently.
+The lead performs capability preflight during scoping. The approved brief assigns each stream a phase, skill, MCP permission, local artifact, and fallback; it must not assume every worker inherits every capability. Every teammate shares the same project specifications, authority hierarchy, and design direction. Reconcile all work through the lead agent before final QA; teammates must not invent competing visual directions independently.
 
 ## Assets and references
 
@@ -147,7 +142,7 @@ pnpm test:e2e:ui
 pnpm build
 ```
 
-Playwright is always-required automated baseline QA, not merely an MCP fallback. It uses an isolated local server on port 3100, reads routes from [`tests/e2e/routes.ts`](tests/e2e/routes.ts), checks browser/runtime health, overflow, and serious or critical axe findings, and records screenshots at 320×568, 390×844, 768×1024, 1440×1000, and 1920×1080. Axe does not replace keyboard, focus, contrast, touch, or interaction reasoning. A discovered browser MCP may add exploratory and visual verification; documented manual review is the last fallback when interactive automation is unavailable.
+Playwright plus axe is mandatory deterministic baseline QA, not merely an MCP fallback. It uses an isolated local server on port 3100, reads routes from [`tests/e2e/routes.ts`](tests/e2e/routes.ts), checks browser/runtime health, overflow, and serious or critical axe findings, and records screenshots at 320×568, 390×844, 768×1024, 1440×1000, and 1920×1080. Axe does not replace keyboard, focus, contrast, touch, or interaction reasoning. Verified Antigravity browser tooling is the preferred additional interactive and visual layer; documented manual inspection is the final fallback.
 
 Generated evidence is described in [`artifacts/qa/README.md`](artifacts/qa/README.md). Screenshot generation alone is not visual review.
 
