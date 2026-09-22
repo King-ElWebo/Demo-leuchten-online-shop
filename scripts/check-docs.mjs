@@ -63,32 +63,69 @@ for (const relativePath of requiredFiles) {
   }
 }
 
-const agentsPath = path.join(root, 'AGENTS.md');
-if (await exists(agentsPath)) {
-  const agentsContent = await readFile(agentsPath, 'utf8');
-  const requiredAgentReferences = [
+const requiredDocumentPhrases = [
+  [
+    'AGENTS.md',
+    [
+      'docs/system/RUNBOOK.md',
+      'docs/system/ANTIGRAVITY.md',
+      'docs/system/TOOLING.md#preferred-antigravity-skill-routing',
+      '.agents/rules/00-showcase-orchestration.md',
+    ],
+  ],
+  [
     'docs/system/RUNBOOK.md',
+    [
+      'capability preflight',
+      'verification-before-completion',
+      'designated OpenDesign owner',
+    ],
+  ],
+  [
     'docs/system/ANTIGRAVITY.md',
+    ['TOOLING.md#preferred-antigravity-skill-routing'],
+  ],
+  [
     '.agents/rules/00-showcase-orchestration.md',
-  ];
+    [
+      '@../../AGENTS.md',
+      'docs/system/TOOLING.md#preferred-antigravity-skill-routing',
+    ],
+  ],
+  [
+    'README.md',
+    [
+      '/goal',
+      'Use verified OpenDesign MCP as the primary design creation and iteration environment',
+    ],
+  ],
+  [
+    'docs/project/DESIGN.md',
+    [
+      'PRIMARY_DESIGN_PARTNER',
+      'CONCEPT_SPRINT_PRIMARY',
+      'May create temporary OpenDesign projects or artifacts',
+      'OpenDesign required for this project',
+    ],
+  ],
+  [
+    'docs/system/TOOLING.md',
+    [
+      '## Skill-guided OpenDesign workflow',
+      'OpenDesign MCP = primary external design creation and iteration workspace',
+    ],
+  ],
+];
 
-  for (const reference of requiredAgentReferences) {
-    if (!agentsContent.includes(reference)) {
-      failures.push(`AGENTS.md does not reference ${reference}.`);
+for (const [relativePath, phrases] of requiredDocumentPhrases) {
+  const absolutePath = path.join(root, relativePath);
+  if (!(await exists(absolutePath))) continue;
+
+  const content = await readFile(absolutePath, 'utf8');
+  for (const phrase of phrases) {
+    if (!content.includes(phrase)) {
+      failures.push(`${relativePath} does not reference: ${phrase}`);
     }
-  }
-}
-
-const readmePath = path.join(root, 'README.md');
-if (await exists(readmePath)) {
-  const readmeContent = await readFile(readmePath, 'utf8');
-  if (
-    !readmeContent.includes('/goal') ||
-    !readmeContent.includes(
-      'Execute the complete Antigravity-first Showcase Website Factory Direct Build',
-    )
-  ) {
-    failures.push('README.md does not expose the Antigravity /goal prompt.');
   }
 }
 

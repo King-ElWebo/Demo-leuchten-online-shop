@@ -74,36 +74,44 @@ Files under [`docs/superpowers/`](docs/superpowers/README.md) are implementation
 
 ## Direct Build and Concept Sprint
 
-Use **Direct Build** when all four project specifications are complete, consistent, and `READY`. The agent may interpret and refine inside the specified direction but must not replace it.
+Use **Direct Build** when all four project specifications are complete, consistent, and `READY`. `READY` means the brief and OpenDesign permissions are executable; when `DESIGN.md` selects `PRIMARY_DESIGN_PARTNER`, verified OpenDesign still creates and iterates the direction before frontend implementation. The agent may interpret and refine inside the specified brief but must not expand product scope.
 
-Use **Concept Sprint** only when visual direction, information architecture, or signature interactions are intentionally unresolved. When the policy in `DESIGN.md` permits it, the sprint may use discovered design skills and the optional official OpenDesign MCP to compare one to three bounded options. The selected decisions must become durable local updates to the owning project specifications before final Direct Build begins. A normal `/goal` must not quietly become an uncontrolled redesign.
+Use **Concept Sprint** only when visual direction, information architecture, or signature interactions are intentionally unresolved. In `CONCEPT_SPRINT_PRIMARY`, selected design skills guide verified OpenDesign while it creates one to three bounded directions. The chosen decisions must become durable local updates before Direct Build; unused directions do not become competing implementation sources.
 
-## Reusable run prompts
+## Natural-language capability intent
 
-These prompts are also stored in [`RUNBOOK.md`](docs/system/RUNBOOK.md).
+Users normally describe the desired outcome rather than list every skill. The agent extracts that intent, discovers and verifies exact capabilities, selects the smallest useful set, reads each selected `SKILL.md`, and applies those instructions while using permitted OpenDesign and later implementation tools. Discovery alone is never reported as skill use. If OpenDesign is unavailable, the fallback in [`TOOLING.md`](docs/system/TOOLING.md#preferred-antigravity-skill-routing) continues locally unless `DESIGN.md` explicitly makes it required.
 
-### Normal Antigravity showcase run
+The generic launch prompts remain in [`RUNBOOK.md`](docs/system/RUNBOOK.md). These examples show how natural-language intent can guide routing without turning the launch prompt into a skill manifest.
+
+### Normal OpenDesign showcase
 
 ```text
 /goal
 
-Execute the complete Antigravity-first Showcase Website Factory Direct Build defined in AGENTS.md for the project in docs/project/.
+Execute the complete Showcase Website Factory workflow defined in AGENTS.md for the project in docs/project/.
 
-Perform the mandatory capability preflight. Use the selected verified skills and MCP tools in their assigned phases; do not merely list them. Continue autonomously through implementation, motion, responsive refinement, accessibility, visual critique, browser verification, corrective iteration and final validation.
+Use verified OpenDesign MCP as the primary design creation and iteration environment according to the permissions in DESIGN.md. Discover and read the relevant selected design skills first, then apply their instructions while creating, critiquing and refining the design through OpenDesign.
 
-Do not stop until every applicable acceptance criterion passes and pnpm qa succeeds, unless a genuine blocker has no safe fallback.
+Persist the selected direction in DESIGN.md before frontend implementation. Route all additional intent through TOOLING.md and use verified specialist skills during implementation, motion, responsive refinement, accessibility, visual polish and final verification.
+
+Continue autonomously until every applicable acceptance criterion and pnpm qa pass, unless a genuine blocker has no safe fallback.
 ```
 
-### Antigravity Teamwork run
+### Hero Teamwork showcase
 
 ```text
 /teamwork-preview
 
-Execute the Antigravity-first Showcase Website Factory workflow defined in AGENTS.md.
+Execute the Showcase Website Factory Teamwork workflow defined in AGENTS.md for the project in docs/project/.
 
-During scoping, read the complete project specification and perform the capability preflight. Create independent workstreams only where they provide real value. Assign clear skill, MCP, permission, fallback and artifact ownership to each workstream.
+Project intent: create a hero portfolio piece with an editorial visual direction, advanced but purposeful scroll choreography, refined responsive transformations and an independent final quality review.
 
-Keep one shared visual direction and reconcile all results through the lead agent. Continue through implementation, motion, responsive refinement, accessibility, visual critique, browser verification and final validation until every applicable acceptance criterion and pnpm qa pass.
+During scoping, perform capability preflight and read the relevant selected skills. Create independent workstreams only where useful. Assign one designated owner for verified OpenDesign operations, explicit MCP permissions, fallbacks and durable local handoff artifacts.
+
+Use one shared OpenDesign direction according to DESIGN.md. Do not let separate workers invent competing visual directions. Reconcile and persist the selected direction through the lead before implementation, then reconcile all work again before browser and final QA.
+
+Continue until every applicable acceptance criterion and pnpm qa pass.
 ```
 
 ## Base repository maintenance

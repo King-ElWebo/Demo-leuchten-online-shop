@@ -8,7 +8,7 @@ Google Antigravity is the primary production runtime for copied Showcase Website
 
 - Use `/goal` for normal three-to-six-page showcase builds. It runs autonomously until the objective is achieved; it does not install or enable missing skills or MCP servers.
 - Reserve `/teamwork-preview` for unusually large hero projects with genuinely independent workstreams. Antigravity Teamwork may begin with an interactive scoping interview and approval of a prompt artifact before autonomous execution.
-- Both entry points must read `AGENTS.md`, run the capability preflight, and follow the same project specifications, authority hierarchy, acceptance contract, and local QA baseline.
+- Both entry points must read `AGENTS.md`, extract capability intent from the current prompt, run the capability preflight, and follow the same project specifications, authority hierarchy, acceptance contract, and local QA baseline.
 
 See Google's official [slash-command overview](https://antigravity.google/docs/slash-commands/) and [Teamwork guide](https://antigravity.google/docs/teamwork/).
 
@@ -25,11 +25,15 @@ See Google's official [slash-command overview](https://antigravity.google/docs/s
 
 These paths follow Google's official [Rules](https://antigravity.google/docs/rules-workflows/), [Agent Skills](https://antigravity.google/docs/skills/), and [MCP](https://antigravity.google/docs/mcp/) documentation.
 
+When workspace-rule activation is managed through the Antigravity application, configure [the showcase orchestration bootstrap](../../.agents/rules/00-showcase-orchestration.md) as **Always on**. The rule is deliberately small: it routes the agent to `AGENTS.md` and canonical skill routing instead of duplicating runtime policy.
+
 ## Discovery and selection
 
-Antigravity discovers skill names and descriptions automatically, then reads the full `SKILL.md` only when the skill is relevant or explicitly invoked. Discovery does not mean selection. A skill is usable only after the preflight confirms its exact name, readable instructions, and phase relevance.
+Antigravity may discover skills from the workspace, supported global locations, or installed providers. Natural-language capability intent in the user prompt maps through the [preferred Antigravity skill routing in `TOOLING.md`](TOOLING.md#preferred-antigravity-skill-routing); an exact skill name is a strong selection signal. The current inventory documented there is an expected preferred profile, not a guaranteed runtime fact.
 
-MCP tools become available after a server is installed, enabled, connected, and exposes them to the model. Availability does not force invocation; the model still selects tools according to the project phase, permissions, and [`TOOLING.md`](TOOLING.md).
+Antigravity discovers skill names and descriptions automatically, then reads the full `SKILL.md` only when the skill is relevant or explicitly invoked. Discovery alone is not verification. A selected skill is usable only after the preflight confirms its exact name, readable instructions, and phase relevance, and the agent must actually follow those instructions in the assigned phase. `/goal` and `/teamwork-preview` do not install missing skills.
+
+MCP tools become available after a server is installed, enabled, connected, and exposes them to the model. Availability does not force invocation; the model still selects tools according to the project phase, permissions, and `TOOLING.md`. OpenDesign remains a separately discovered and verified MCP capability, never a skill. When `DESIGN.md` selects `PRIMARY_DESIGN_PARTNER` or `CONCEPT_SPRINT_PRIMARY`, verified OpenDesign is the preferred design workspace; selected skills must be read first and guide how Antigravity uses it.
 
 The preflight reports every relevant capability as one of:
 
@@ -43,12 +47,16 @@ An MCP reaches `SELECTED_VERIFIED` only after a harmless read-only health or dis
 
 ## OpenDesign policy
 
-OpenDesign is the preferred optional design MCP when its [official upstream Antigravity integration](https://github.com/nexu-io/open-design) is installed globally and verified. It is never a factory dependency.
+OpenDesign is the preferred primary design creation and iteration environment when its [official upstream Antigravity integration](https://github.com/nexu-io/open-design) is installed globally, verified by a harmless read-only probe, permitted by `DESIGN.md`, and not disabled by the user. It remains technically optional so copied repositories can finish through a local fallback.
 
-- **Direct Build:** default to `AVAILABLE_NOT_SELECTED` when `DESIGN.md` is `READY`. Use it only for bounded implementation support, focused critique, or validation of a difficult visual decision.
-- **Concept Sprint:** it may become `SELECTED_VERIFIED` only when `DESIGN.md` permits `CONCEPT_SPRINT_ALLOWED`, the direction is intentionally unresolved, and bounded alternatives are requested.
-- Translate useful results into `DESIGN.md`, local reference notes, permitted local assets, or implementation requirements. Temporary MCP output is not a source of truth.
-- Read-only reachability never authorizes project creation, generation, artifact saving, updates, deletion, or publishing.
+- `OFF`: do not use OpenDesign.
+- `CRITIQUE_ONLY`: use it only for permitted focused critique or validation; do not create a new direction.
+- `PRIMARY_DESIGN_PARTNER`: the recommended normal portfolio-showcase mode. Read the selected design skills first, apply them while OpenDesign creates and iterates the direction, then persist the result before code.
+- `CONCEPT_SPRINT_PRIMARY`: use OpenDesign for one to three skill-guided directions when art direction is intentionally unresolved; keep only the selected direction as implementation authority.
+
+A health check never authorizes creation or writes. A completed and approved `DESIGN.md` policy authorizes exactly its listed non-destructive OpenDesign operations for that project. Deletion, public publishing, account changes, and unrelated external mutations still require separate direct authorization. Persist selected decisions in `DESIGN.md`, local reference notes, permitted local assets, and implementation requirements; temporary MCP output is not a source of truth.
+
+If OpenDesign cannot be verified, report the fallback and continue with project specifications, supplied references, selected verified design skills, local implementation, browser critique, and deterministic QA. Block only when `DESIGN.md` explicitly makes OpenDesign required and rejects fallback.
 
 ## Browser and deterministic QA
 

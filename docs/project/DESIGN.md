@@ -132,12 +132,21 @@ Store supporting captures in [`references/`](../../references/README.md).
 
 ## External design tooling policy
 
-- **OpenDesign mode (`OFF`, `CRITIQUE_ONLY`, or `CONCEPT_SPRINT_ALLOWED`):** [REQUIRED: replace before production run]
-- **Maximum generated directions (`0` for `OFF` or `CRITIQUE_ONLY`; otherwise `1` to `3`):** [REQUIRED: replace before production run]
-- **External project or artifact writes and their exact boundary:** [REQUIRED: replace before production run]
+- **OpenDesign mode (`OFF`, `CRITIQUE_ONLY`, `PRIMARY_DESIGN_PARTNER`, or `CONCEPT_SPRINT_PRIMARY`):** [REQUIRED: replace before production run]
+- **OpenDesign required for this project (`Yes` or `No`):** [REQUIRED: replace before production run]
+- **May create temporary OpenDesign projects or artifacts (`Yes` or `No`):** [REQUIRED: replace before production run]
+- **May generate initial design directions (`Yes` or `No`):** [REQUIRED: replace before production run]
+- **Maximum initial directions (`0` to `3`):** [REQUIRED: replace before production run]
+- **May refine the selected direction (`Yes` or `No`):** [REQUIRED: replace before production run]
+- **May save or update OpenDesign artifacts (`Yes` or `No`):** [REQUIRED: replace before production run]
+- **May export permitted assets locally (`Yes` or `No`):** [REQUIRED: replace before production run]
+- **May publish publicly:** No unless separately authorized
+- **May delete external projects or artifacts:** No unless separately authorized
 - **Required durable local output (`DESIGN.md` decisions, reference notes, permitted assets, and implementation requirements):** [REQUIRED: replace before production run]
 
-Recommended defaults are `OFF` or `CRITIQUE_ONLY` for a normal showcase and `CONCEPT_SPRINT_ALLOWED` only for a hero showcase or intentionally unresolved direction. A capability health check does not authorize design generation or external writes. Destructive deletion and public publishing are prohibited unless the user directly authorizes the exact action.
+`PRIMARY_DESIGN_PARTNER` is the recommended default for a high-quality portfolio showcase. Choose `OFF` when the project must remain entirely local, `CRITIQUE_ONLY` when an existing direction must not be recreated, and `CONCEPT_SPRINT_PRIMARY` when one to three intentionally distinct directions are authorized. Do not silently override the selected mode.
+
+A harmless capability health check authorizes no creation or write. Once this completed policy is approved and the project is `READY`, it is project-scoped authorization for the listed non-destructive OpenDesign operations. Deletion, public publishing, account changes, and unrelated external mutations always require separate direct authorization. If verified OpenDesign is unavailable, use the documented local fallback unless **OpenDesign required for this project** is `Yes`.
 
 ## Explicit anti-patterns
 
