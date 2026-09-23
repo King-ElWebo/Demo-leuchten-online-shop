@@ -1,4 +1,8 @@
 allowBuilds:
+  esbuild: true
   unrs-resolver: true
+  workerd: true
+minimumReleaseAgeExclude:
+  - wrangler@4.136.3
 onlyBuiltDependencies:
   - unrs-resolver

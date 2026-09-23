@@ -18,7 +18,7 @@ This is the operational sequence for an Antigravity-first Showcase Website Facto
 1. Read `AGENTS.md`, then every project, system, skill-directory, and rule file in its required reading order; extract explicit capability intent from the current user prompt.
 2. Validate readiness and consistency. Reconcile a newer direct instruction into the owning project document before implementation; base-template maintenance may retain `TEMPLATE_NOT_CONFIGURED`.
 3. Run capability preflight: discover and verify exact skills and MCP tools, map intent through `TOOLING.md`, select the smallest useful set, assign one phase or bounded role per skill, and record fallbacks.
-4. Plan routes, architecture, content modules, assets, tests, evidence, and a short design hypothesis. Use verified planning skills only when warranted.
+4. Plan routes, architecture, content modules, assets, tests, evidence, and a short design hypothesis. Use verified planning skills only when warranted. Classify the project as static Cloudflare Pages by default; if `SITE.md` needs real server behavior, settle a separate hosting/architecture decision before implementation. Follow [`CLOUDFLARE.md`](CLOUDFLARE.md).
 5. Choose Direct Build or an authorized Concept Sprint, then discover and read only the design skills required for that mode and brief.
 6. For a qualifying fresh website, use the design hypothesis and selected skills to guide verified Stitch toward two meaningfully different directions; use three only when the design is especially important or genuinely unresolved.
 7. Evaluate the directions against `DESIGN.md`, `SITE.md`, content needs, accessibility, responsiveness, asset feasibility, and anti-generic requirements. Select or synthesize one coherent direction; do not mistake superficial color variants for alternatives.
@@ -33,7 +33,7 @@ This is the operational sequence for an Antigravity-first Showcase Website Facto
 16. Follow `verification-before-completion` and assemble fresh evidence before making any completion claim.
 17. Use verified Antigravity browser tooling for interactive and visual QA. Inspect live layouts and screenshots rather than merely generating them.
 18. Run the mandatory Playwright and axe baseline after browser-driven corrections.
-19. Run one final aggregate `pnpm qa` after corrective iteration. Do not needlessly run the entire aggregate sequence twice; it owns final formatting, documentation, lint, typecheck, Playwright, and build evidence.
+19. Run one final aggregate `pnpm qa` after corrective iteration. Do not needlessly run the entire aggregate sequence twice; it owns formatting, documentation, lint, typecheck, Playwright/axe, one `out/` build, and exported-site tests through `wrangler pages dev out` (direct URLs, reloads, responsive images, and key interactions).
 20. Produce a concise completion report naming selected skills and phases, Stitch use or fallback, routes, interactions, viewports, screenshots, commands, results, and genuine blockers.
 
 ## Mode routing

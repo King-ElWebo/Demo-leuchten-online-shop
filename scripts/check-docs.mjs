@@ -14,6 +14,7 @@ const requiredFiles = [
   'docs/system/TOOLING.md',
   'docs/system/RUNBOOK.md',
   'docs/system/ANTIGRAVITY.md',
+  'docs/system/CLOUDFLARE.md',
   '.agents/skills/README.md',
   '.agents/rules/00-showcase-orchestration.md',
   '.agents/rules/code-quality.md',
@@ -46,7 +47,10 @@ async function markdownFiles(directory) {
   const nested = await Promise.all(
     entries
       .filter(
-        (entry) => !['node_modules', '.next', 'artifacts'].includes(entry.name),
+        (entry) =>
+          !['node_modules', '.next', '.wrangler', 'out', 'artifacts'].includes(
+            entry.name,
+          ),
       )
       .map(async (entry) => {
         const entryPath = path.join(directory, entry.name);
@@ -69,6 +73,7 @@ const requiredDocumentPhrases = [
     [
       'docs/system/RUNBOOK.md',
       'docs/system/ANTIGRAVITY.md',
+      'docs/system/CLOUDFLARE.md',
       'docs/system/TOOLING.md#preferred-antigravity-skill-routing',
       '.agents/rules/00-showcase-orchestration.md',
     ],
@@ -79,8 +84,11 @@ const requiredDocumentPhrases = [
       'capability preflight',
       'verification-before-completion',
       'one design-focused workstream may use Stitch',
+      'pnpm qa',
+      'wrangler pages dev out',
     ],
   ],
+  ['docs/system/CLOUDFLARE.md', ['pnpm build', 'out/', 'pnpm test:static']],
   [
     'docs/system/ANTIGRAVITY.md',
     ['TOOLING.md#preferred-antigravity-skill-routing', 'mcp(stitch/*)'],

@@ -91,6 +91,7 @@ Detailed visual transformations belong in [`DESIGN.md`](DESIGN.md). Objective vi
 
 ## Functional requirements
 
+- **Hosting classification:** [REQUIRED: replace before production run] (default: static Cloudflare Pages export; real request-time server behavior needs a separate hosting decision rather than a simulated success state).
 - [REQUIRED: replace before production run]
 - Every listed route must load directly and through navigation.
 - Every visible control must perform its documented action.

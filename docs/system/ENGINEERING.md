@@ -8,6 +8,7 @@ This document defines the stable implementation architecture for every showcase.
 - Use Server Components by default. Add `'use client'` only for real browser interactivity, state, gestures, or motion.
 - Keep client and motion boundaries small; do not convert a page or large section to a Client Component for one interactive child.
 - Prefer static generation for stable showcase content.
+- Cloudflare Pages static export is the default. Build every dynamic route from finite data with `generateStaticParams()`. If `SITE.md` requires real request-time behavior, record a separate hosting decision; do not simulate a server feature and call it complete.
 - Use typed local data by default.
 - Do not add a database, CMS, authentication, API, or backend infrastructure unless [`SITE.md`](../project/SITE.md) requires it.
 - Pages compose sections. Sections receive data through typed props and compose presentational components.
@@ -69,7 +70,7 @@ Derive local data modules from [`CONTENT.md`](../project/CONTENT.md) and avoid t
 
 ## Performance
 
-- Use `next/image` for content images and define correct responsive `sizes`.
+- Use `next/image` with the local build-time variants and define correct responsive `sizes`; the exported site must not require Next's runtime image optimizer. Prioritize only visible lead images and lazy-load offscreen media. See [`CLOUDFLARE.md`](CLOUDFLARE.md#responsive-local-media).
 - Use supported `next/font` tooling for project fonts; do not add blocking remote stylesheet links.
 - Keep client JavaScript proportional to actual interactivity.
 - Prefer transforms and opacity for animation where practical.

@@ -275,8 +275,9 @@ These checks do not depend on optional MCP access or globally installed skills.
 | Static code quality                | `pnpm lint`         | ESLint and Next.js rules pass without suppressing root causes.                                                                                                                      |
 | Type safety                        | `pnpm typecheck`    | Strict TypeScript passes.                                                                                                                                                           |
 | Browser and accessibility baseline | `pnpm test:e2e`     | Registered routes pass runtime, console, overflow, serious/critical axe, and screenshot coverage. Axe does not replace keyboard or focus reasoning.                                 |
-| Production readiness               | `pnpm build`        | The Next.js production build completes.                                                                                                                                             |
-| Aggregate gate                     | `pnpm qa`           | Formatting, docs, lint, types, Playwright, and production build all pass in sequence.                                                                                               |
+| Static export                      | `pnpm build`        | Local responsive media variants and the Next.js `out/` export are produced; server-only requirements must fail or be classified as exceptions.                                      |
+| Exported-site behavior             | `pnpm test:static`  | After the build, Wrangler Pages serves `out/` for direct routes, reloads, responsive images, and core interactions. See [`CLOUDFLARE.md`](CLOUDFLARE.md).                           |
+| Aggregate gate                     | `pnpm qa`           | Formatting, docs, lint, types, Playwright/axe, one production export, and exported-site checks all pass in sequence.                                                                |
 
 Playwright is mandatory baseline QA, not a fallback. Keep [`tests/e2e/routes.ts`](../../tests/e2e/routes.ts) aligned with `SITE.md` and add project-specific interaction assertions where acceptance requires them. Browser MCP, when available, adds exploratory and visual coverage; it does not reduce the Playwright obligation.
 

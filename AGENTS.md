@@ -15,13 +15,14 @@ Before planning or implementation, read these exact files in order:
 7. [`docs/system/ANTIGRAVITY.md`](docs/system/ANTIGRAVITY.md)
 8. [`docs/system/TOOLING.md`](docs/system/TOOLING.md)
 9. [`docs/system/RUNBOOK.md`](docs/system/RUNBOOK.md)
-10. [`.agents/skills/README.md`](.agents/skills/README.md)
-11. [`.agents/rules/00-showcase-orchestration.md`](.agents/rules/00-showcase-orchestration.md)
-12. [`.agents/rules/code-quality.md`](.agents/rules/code-quality.md)
-13. [`.agents/rules/design-quality.md`](.agents/rules/design-quality.md)
-14. [`.agents/rules/responsive-accessibility.md`](.agents/rules/responsive-accessibility.md)
-15. [`.agents/rules/motion-quality.md`](.agents/rules/motion-quality.md)
-16. [`.agents/rules/qa-completion.md`](.agents/rules/qa-completion.md)
+10. [`docs/system/CLOUDFLARE.md`](docs/system/CLOUDFLARE.md)
+11. [`.agents/skills/README.md`](.agents/skills/README.md)
+12. [`.agents/rules/00-showcase-orchestration.md`](.agents/rules/00-showcase-orchestration.md)
+13. [`.agents/rules/code-quality.md`](.agents/rules/code-quality.md)
+14. [`.agents/rules/design-quality.md`](.agents/rules/design-quality.md)
+15. [`.agents/rules/responsive-accessibility.md`](.agents/rules/responsive-accessibility.md)
+16. [`.agents/rules/motion-quality.md`](.agents/rules/motion-quality.md)
+17. [`.agents/rules/qa-completion.md`](.agents/rules/qa-completion.md)
 
 Files under [`docs/superpowers/`](docs/superpowers/README.md) are implementation history, not current runtime authority, and are not part of this required reading order.
 
@@ -33,6 +34,8 @@ Files under [`docs/superpowers/`](docs/superpowers/README.md) are implementation
 - **MCP servers and external tools** provide optional external data, tools, or interactive capabilities. They are not skills, npm packages, or runtime dependencies of the finished website.
 - **Stitch MCP** is the preferred optional visual exploration and UI concept surface for qualifying fresh showcase work. Selected skills guide how Antigravity uses it; Stitch does not invoke those skills, own application architecture, or replace project documents as durable authority.
 - **Local tooling** is the repository-owned deterministic baseline: Prettier, the documentation checker, ESLint, TypeScript, Playwright with axe, and the production build.
+
+For static showcases, Cloudflare Pages is the default deployment target, and `pnpm build` must export `out/` with local responsive images. Classify real server needs in `SITE.md` before implementation; they require a separate hosting decision, never an unlabelled simulation. Follow [`docs/system/CLOUDFLARE.md`](docs/system/CLOUDFLARE.md) for the static contract and publication checklist. No deployment is implied by this default.
 
 Resolve every conflict in this order:
 
@@ -116,7 +119,7 @@ Follow the full operational sequence in [`docs/system/RUNBOOK.md`](docs/system/R
 12. Run focused checks and useful browser verification while implementation is still changing.
 13. Fix discovered problems at their root.
 14. Repeat until acceptance passes or a genuine blocker remains.
-15. After corrective iteration, run the final aggregate `pnpm qa` once; it owns formatting, documentation, lint, typecheck, Playwright, and build validation.
+15. After corrective iteration, run the final aggregate `pnpm qa` once; it owns formatting, documentation, lint, typecheck, Playwright with axe, the static `out/` build, and direct-route/reload/image/interaction tests against `wrangler pages dev out`.
 16. Produce an evidence-based completion report.
 
 Skills provide phase-specific expertise. MCP tools provide optional external capabilities. Both feed durable local implementation and evidence; neither determines scope or completion. Missing optional capabilities never block work when the fallback in `TOOLING.md` is safe.
@@ -127,6 +130,7 @@ The default phase ownership for a fresh showcase is: current user intent plus pr
 
 - Use Server Components by default and keep interactive or motion client boundaries small.
 - Do not add backend infrastructure, APIs, authentication, a database, or a CMS unless `SITE.md` requires it.
+- Keep static export as the normal default; build dynamic paths with `generateStaticParams()`, use local responsive image variants, and surface any genuine server requirement as a hosting exception.
 - Do not invent features, generic marketing copy, or a visual direction that expands or replaces the project specifications.
 - Do not turn the system into a universal section builder or impose a reusable visual theme.
 - Preserve the specified typography, image grammar, density, responsive art direction, motion character, and signature moments.
@@ -144,7 +148,7 @@ Repository inspection and approved local implementation are allowed. If the Anti
 Do not finish merely because the application compiles. Completion requires:
 
 - every applicable item in [`docs/project/ACCEPTANCE.md`](docs/project/ACCEPTANCE.md) to pass without expanding the owning project specifications;
-- successful local formatting, documentation integrity, ESLint, TypeScript, Playwright with axe, production build, and aggregate `pnpm qa` checks;
+- successful local formatting, documentation integrity, ESLint, TypeScript, Playwright with axe, production static export, exported-site checks through Wrangler Pages, and aggregate `pnpm qa` checks;
 - interactive, responsive, accessibility, motion, and visual review appropriate to the project;
 - a concise final report naming routes, interactions, viewports, screenshots, commands, observed results, fallbacks used, and exact unresolved blockers.
 

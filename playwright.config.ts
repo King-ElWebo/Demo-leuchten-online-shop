@@ -4,6 +4,7 @@ const visualTag = /@visual/;
 
 export default defineConfig({
   testDir: './tests/e2e',
+  testIgnore: 'static-export.spec.ts',
   outputDir: 'artifacts/qa/test-results',
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),

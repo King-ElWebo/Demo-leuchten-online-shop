@@ -28,6 +28,8 @@ flowchart TD
 
 [`AGENTS.md`](AGENTS.md) is the definitive orchestrator. [`ANTIGRAVITY.md`](docs/system/ANTIGRAVITY.md) defines the primary runtime contract. [`RUNBOOK.md`](docs/system/RUNBOOK.md) defines the autonomous phase order. [`TOOLING.md`](docs/system/TOOLING.md) routes capabilities and fallbacks.
 
+Static Next.js showcases target Cloudflare Pages by default. [`CLOUDFLARE.md`](docs/system/CLOUDFLARE.md) defines the export, responsive-image, local-preview, hosting-exception, and publication contracts. It does not constrain a project's visual identity.
+
 ## Precise terminology
 
 - **Project specifications** are [`SITE.md`](docs/project/SITE.md), [`DESIGN.md`](docs/project/DESIGN.md), [`CONTENT.md`](docs/project/CONTENT.md), and [`ACCEPTANCE.md`](docs/project/ACCEPTANCE.md). They define one showcase.
@@ -51,6 +53,7 @@ Authority is resolved in this order: direct user instructions; the relevant proj
 | Antigravity runtime, discovery, configuration boundaries, and readiness audit      | [`ANTIGRAVITY.md`](docs/system/ANTIGRAVITY.md)                        |
 | Skill discovery, MCP routing, fallbacks, commands, and evidence                    | [`TOOLING.md`](docs/system/TOOLING.md)                                |
 | Autonomous phase order, execution modes, entry points, and launch prompts          | [`RUNBOOK.md`](docs/system/RUNBOOK.md)                                |
+| Static Cloudflare Pages export, media, preview, and publication checks             | [`CLOUDFLARE.md`](docs/system/CLOUDFLARE.md)                          |
 | Reading order, authority hierarchy, preflight, restrictions, and completion gate   | [`AGENTS.md`](AGENTS.md)                                              |
 | Permanent concise constraints                                                      | [`.agents/rules/`](.agents/rules/code-quality.md)                     |
 | QA output                                                                          | Local command output and [`artifacts/qa/`](artifacts/qa/README.md)    |
@@ -69,6 +72,8 @@ Files under [`docs/superpowers/`](docs/superpowers/README.md) are implementation
 4. Remove every `[REQUIRED: replace before production run]` marker and set all four specifications to `READY`.
 5. Add stable production media under [`public/media/`](public/media/README.md), reference notes under [`references/`](references/README.md), and only deliberately bounded concept work under [`concepts/`](concepts/README.md).
 6. Start the normal Antigravity `/goal` prompt below. The workspace bootstrap rule leads Antigravity to `AGENTS.md`; the agent performs capability preflight, uses the smallest useful verified capability set in its assigned phases, and continues through `pnpm qa`.
+
+The copied project's default `pnpm build` creates a static `out/` directory and local responsive image variants for Cloudflare Pages. If its `SITE.md` requires a real server, form receiver, authentication, or request-time rendering, make an explicit hosting decision first; do not mask that requirement with a simulated feature.
 
 `TEMPLATE_NOT_CONFIGURED` is intentional in the untouched factory and does not fail the base repository's QA. A configured production project may not retain required markers.
 
@@ -150,11 +155,16 @@ pnpm typecheck
 pnpm test:e2e
 pnpm test:e2e:ui
 pnpm build
+pnpm test:static # after pnpm build; checks out/ through wrangler pages dev out
 ```
 
 Playwright plus axe is mandatory deterministic baseline QA, not merely an MCP fallback. It uses an isolated local server on port 3100, reads routes from [`tests/e2e/routes.ts`](tests/e2e/routes.ts), checks browser/runtime health, overflow, and serious or critical axe findings, and records screenshots at 320×568, 390×844, 768×1024, 1440×1000, and 1920×1080. Axe does not replace keyboard, focus, contrast, touch, or interaction reasoning. Verified Antigravity browser tooling is the preferred additional interactive and visual layer; documented manual inspection is the final fallback.
 
 Generated evidence is described in [`artifacts/qa/README.md`](artifacts/qa/README.md). Screenshot generation alone is not visual review.
+
+## Cloudflare Pages handoff
+
+For a concrete **static** demo, choose the “Next.js (Static HTML Export)” Pages preset, use build command `pnpm build`, and set output directory `out`. Read its own [`package.json`](package.json) for the compatible Node range (`engines.node`) and exact pnpm version (`packageManager`); set Pages' `NODE_VERSION` and `PNPM_VERSION` only if its defaults differ. Before publishing a fictional demo, verify the concept label, image/font rights, truthful operator details, non-misleading demo forms, and the live preview. The [full concise checklist](docs/system/CLOUDFLARE.md#pages-settings-when-publishing-a-specific-demo) is the handoff; this repository never deploys automatically.
 
 ## Maintain the master template
 

@@ -46,6 +46,8 @@ Default review viewports are editable per project:
 
 ## Browser health
 
+- [ ] For a static project, `pnpm build` creates `out/`; every required route loads directly and reloads from `wrangler pages dev out` with HTTP 200.
+- [ ] Exported-site navigation, key interactions, and responsive local image variants work without a Next.js server or runtime image optimizer.
 - [ ] Every required route has zero uncaught page errors.
 - [ ] Every required route has zero unexpected browser console errors.
 - [ ] Network failures do not break locally assigned production assets.

@@ -5,6 +5,8 @@
 # Next.js
 /.next/
 /out/
+/.wrangler/
+/public/media/responsive/
 
 # local environment
 .env*
@@ -22,6 +24,7 @@ Thumbs.db
 # generated QA evidence
 /artifacts/qa/playwright-report/
 /artifacts/qa/test-results/
+/artifacts/qa/static-test-results/
 /artifacts/qa/screenshots/
 /playwright/.cache/
 

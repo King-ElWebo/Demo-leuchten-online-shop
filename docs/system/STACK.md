@@ -4,20 +4,21 @@ This document explains package roles and selection rules. Exact installed versio
 
 ## Default stack
 
-| Tool                            | Default role                                                          | Decision note                                                               |
-| ------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| Next.js App Router              | Routing, Server Components, metadata, static output where appropriate | Follow current App Router conventions; do not use removed `next lint`.      |
-| React                           | Component composition and narrowly scoped client interaction          | Keep pages server-rendered unless interaction requires a client boundary.   |
-| TypeScript                      | Strict domain and prop contracts                                      | Keep strict checks enabled.                                                 |
-| Tailwind CSS                    | Utility styling where it improves local clarity                       | It is infrastructure, not a supplied visual theme. Plain CSS remains valid. |
-| Motion for React (`motion`)     | Presence, gestures, dynamic interaction, and layout transitions       | Import only in client boundaries that need it.                              |
-| Playwright                      | Route, interaction, responsive, console, screenshot, and browser QA   | Maintain the central route registry.                                        |
-| axe-core Playwright integration | Lightweight automated accessibility scan                              | It supplements keyboard and visual review; it does not replace them.        |
-| ESLint                          | Direct CLI linting with Next.js Core Web Vitals and TypeScript rules  | `next lint` was removed in Next.js 16.                                      |
-| Prettier                        | Deterministic formatting                                              | Keep configuration small.                                                   |
-| `next/image`                    | Responsive optimized images                                           | Provide dimensions and `sizes`; local assets are preferred.                 |
-| `next/font`                     | Self-hosted, optimized project fonts                                  | Select fonts only after creative direction is defined.                      |
-| pnpm                            | Dependency installation and script execution                          | Keep exact versions and the lockfile.                                       |
+| Tool                            | Default role                                                                       | Decision note                                                                           |
+| ------------------------------- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Next.js App Router              | Routing, Server Components, metadata, static export to Cloudflare Pages by default | Use `generateStaticParams()` for finite dynamic routes; do not use removed `next lint`. |
+| React                           | Component composition and narrowly scoped client interaction                       | Keep pages server-rendered unless interaction requires a client boundary.               |
+| TypeScript                      | Strict domain and prop contracts                                                   | Keep strict checks enabled.                                                             |
+| Tailwind CSS                    | Utility styling where it improves local clarity                                    | It is infrastructure, not a supplied visual theme. Plain CSS remains valid.             |
+| Motion for React (`motion`)     | Presence, gestures, dynamic interaction, and layout transitions                    | Import only in client boundaries that need it.                                          |
+| Playwright                      | Route, interaction, responsive, console, screenshot, and browser QA                | Maintain the central route registry.                                                    |
+| axe-core Playwright integration | Lightweight automated accessibility scan                                           | It supplements keyboard and visual review; it does not replace them.                    |
+| ESLint                          | Direct CLI linting with Next.js Core Web Vitals and TypeScript rules               | `next lint` was removed in Next.js 16.                                                  |
+| Prettier                        | Deterministic formatting                                                           | Keep configuration small.                                                               |
+| `next/image` + Sharp            | Local build-time WebP variants and responsive `srcset` for static export           | Provide dimensions and accurate `sizes`; no runtime image optimizer required.           |
+| `next/font`                     | Self-hosted, optimized project fonts                                               | Select fonts only after creative direction is defined.                                  |
+| pnpm                            | Dependency installation and script execution                                       | Keep exact versions and the lockfile.                                                   |
+| Wrangler Pages                  | Local inspection of the exported `out/` directory                                  | Project-local dev tool; no deployment is part of normal QA.                             |
 
 Lucide may be added when a project genuinely needs a coherent icon set. Do not install it pre-emptively or let its default icon choices determine the identity.
 
@@ -55,6 +56,8 @@ Add only when a completed project specification justifies the cost.
 - Backend APIs
 
 These are not forbidden forever; they require explicit project justification and an updated [`SITE.md`](../project/SITE.md), architecture review, and acceptance coverage.
+
+Static export is the default, not a way to disguise server requirements. A project needing request-time rendering, real form handling, authentication, or another server feature needs a separate hosting decision before its Next configuration changes. See [`CLOUDFLARE.md`](CLOUDFLARE.md).
 
 ## Selection rules
 

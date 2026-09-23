@@ -7,8 +7,11 @@ export default defineConfig([
   ...nextTypeScript,
   globalIgnores([
     '.next/**',
+    '.wrangler/**',
+    'out/**',
     'node_modules/**',
     'artifacts/qa/playwright-report/**',
     'artifacts/qa/test-results/**',
+    'artifacts/qa/static-test-results/**',
   ]),
 ]);
