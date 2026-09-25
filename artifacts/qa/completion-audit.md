@@ -10,80 +10,101 @@
 
 ## 1. Durchgeführte Belegprüfungen & Befunde
 
-### 1.1 Preis- und Steuermodell (Österreich 20 % USt.)
+### 1.1 Gemeinsamer physischer Lagerbestand über Katalog- und Konfigurator-Positionen
 
-- **Befund zuvor:** Vorab existierten teils abweichende „19 % MwSt.“-Angaben sowie eine additive Preisberechnung im Warenkorb, wodurch ein beworbener Bruttopreis (z. B. 3.450 €) an der Kasse sprunghaft anstieg.
+- **Befund zuvor:** Eine Katalogvariante (z. B. Standard-Messing `LW-KOR-BRS-01`) und eine oder mehrere Konfigurator-Positionen mit derselben Oberfläche teilten sich denselben physischen Bestand (6 Stück). Vorab wurde die Mengenprüfung jedoch isoliert pro Warenkorb-Position durchgeführt, wodurch die Summe beider Positionen das physische Atelier-Kontingent überschreiten konnte.
 - **Umgesetzte Lösung:**
-  - Verbindliches Bruttopreissystem etabliert: Alle im Katalog, Konfigurator und Produktdetail angegebenen Preise sind Endpreise inklusive 20 % österreichischer Umsatzsteuer.
-  - Exakte Cent-Berechnung: Bei einem Artikel im Wert von 3.450,00 € bleibt der Endbetrag exakt 3.450,00 € (Netto: 2.875,00 €, 20 % USt.: 575,00 €).
-  - Alle Erwähnungen von „19 % MwSt.“ im Code, UI-Komponenten und Produktdokumenten wurden restlos durch „20 % USt. (Österreich)“ ersetzt.
+  - Kanonische Auflösung via `resolvePhysicalVariant` in `src/lib/domain/stock.ts`: Identifiziert sowohl Katalog-SKUs als auch dynamische Konfigurator-Serien-SKUs (`LW-KOR-2700K-BRS-...`) und ordnet sie eindeutig der physischen Ausführung zu.
+  - Strikte Summenbildung (`getInCartPhysicalQuantity` und `getAvailableForCart`): Beim Hinzufügen zum Warenkorb (`addToCart`) und bei Mengenänderungen (`updateQuantity`) wird die **Gesamtsumme aller Positionen**, die dieselbe physische Variante belegen, gegen den verbleibenden Lagerbestand geprüft.
+  - Aggregierte Checkout-Validierung (`validateCartStockAgainstRemaining(cart, orders)`): Vor Erzeugung einer Demo-Bestellung in `createDemoOrder` wird der gesamte Warenkorb geprüft. Sollte der Gesamtbestand überschritten sein (z. B. durch externe Manipulation oder Überbuchung), wird der Checkout mit einer verständlichen Fehlermeldung verweigert.
+  - Das Händler-Dashboard bucht Bestellungen (Katalog & Konfigurator) in Echtzeit vom physischen Lagerbestand ab.
 
-### 1.2 Lager- und Konfigurator-Bestandsmodell
+### 1.2 Reload-sichere Duplikat-Bestellungs-Verhinderung & Idempotenz
 
-- **Befund zuvor:** Konfigurierte KORONA I-Modelle erzeugten eine dynamische Serien-SKU (z. B. `LW-KOR-2700K-BRS-...`), welche in der Bestandszählung des Händler-Cockpits nicht den physischen Rohmaterial-Varianten zugeordnet wurde. Zudem fehlte eine Vorab-Prüfung gegen Überbuchung.
+- **Befund zuvor:** Wenn `saveCart([])` beim Checkout fehlschlug (z. B. durch Browser-Speicherblockaden oder Quota-Fehler), konnte ein Neuladen der Seite den bereits bestellten Warenkorb wiederbeleben und zu Doppelbestellungen führen.
 - **Umgesetzte Lösung:**
-  - Modul `src/lib/domain/stock.ts` implementiert mit `itemMatchesVariant`, `getRemainingStock` und `getAvailableForCart`.
-  - Konfigurator mappt Oberflächenfinish nahtlos auf physische Lager-SKUs:
-    - _Messing Natur_ ➔ `LW-KOR-BRS-01` (Basisbestand: 6)
-    - _Vulkanbasalt Patina dunkel_ ➔ `LW-KOR-BST-02` (Basisbestand: 3)
-    - _Schwarzstahl Atelier geölt_ ➔ `LW-KOR-STL-03` (Basisbestand: 4)
-  - `addToCart` und `updateQuantity` verhindern ein Hinzufügen über den physischen Freibestand hinaus und zeigen präzise Meldungen.
-  - `createDemoOrder` validiert vor dem Erzeugen des Auftrags den Bestand aller Warenkorb-Positionen gegen Überbuchung.
-  - Das Händler-Dashboard bucht Bestellungen (sowohl Standard-Varianten als auch konfigurierte Leuchten) in Echtzeit vom physischen Lagerbestand ab.
+  - Persistenter Lebenszyklus über `cartSessionId` (`lumenwerk_cart_session_id_v1`): Jeder Warenkorb besitzt eine eindeutige Session-ID.
+  - Sobald ein Auftrag erfolgreich im Speicher verbucht wird (`saveLocalDemoOrder`), wird die `cartSessionId` unwiderruflich in `lumenwerk_completed_carts_v1` als abgeschlossen markiert.
+  - Resiliente Stale-Cart-Erkennung in `loadCart()`: Beim Neuladen der Seite wird geprüft, ob die aktuelle Warenkorb-Session bereits als abgeschlossen registriert ist. Ist dies der Fall, wird der veraltete Warenkorb automatisch aus dem LocalStorage bereinigt, die Session rotiert und ein leerer Warenkorb zurückgegeben.
+  - Idempotenz-Schutz in `createDemoOrder`: Ein erneutes Absenden eines bereits verbuchten Warenkorbs wird blockiert.
+  - Sofortiges Leeren des In-Memory-States (`setCart([])`) stellt sicher, dass selbst bei einem Storage-Schreibfehler kein doppelter Submit möglich ist.
 
-### 1.3 Storage-Fehlerbehandlung & Resilienz
+### 1.3 Resilientes Händler-Reset & Fehler-Feedback
 
-- **Befund zuvor:** `clearCart`, `removeFromCart` und `saveLocalDemoOrder` meldeten teils impliziten Erfolg, und ein möglicher Storage-Fehler beim Leeren des Warenkorbs nach erfolgreicher Bestellung barg das Risiko von Doppelbestellungen.
+- **Befund zuvor:** `handleReset` im Händler-Cockpit ging von implizitem Erfolg aus, ohne den Rückgabewert von `resetDemoData()` zu prüfen. Bei einem lokalen Speicherfehler wurde irreführend Erfolg gemeldet.
 - **Umgesetzte Lösung:**
-  - Explizite Rückgabetypen `{ success: boolean, error?: string }` in allen Storage- und Context-Aktionen.
-  - In `createDemoOrder` wird nach erfolgreicher Speicherung des Auftrags der In-Memory-Warenkorb immer sofort geleert (`setCart([])`), selbst wenn das Löschen im Browser-`localStorage` fehlschlagen sollte. Ein erneuter Klick auf „Bestellung abschicken“ ist dadurch unmöglich.
-  - Initiale Vorbelegung von `orders` mit `baselineHistoricalOrders` verhindert ein visuelles Aufblitzen von „0 € / 0 Bestellungen“ während SSR und Prerendering.
+  - `resetDemoData()` gibt `{ success: boolean, error?: string }` zurück.
+  - `HaendlerClient.tsx` wertet den Status explizit aus:
+    - Bei Erfolg: Bestätigungsbanner mit `role="status"` und Information über die Wiederherstellung der 7 Referenzaufträge.
+    - Bei Fehler: Barrierefreie Fehlermeldung mit `role="alert"` (`resetError`). Die vorhandenen Aufträge und KPIs bleiben unberührt und werden nicht korrumpiert.
 
-### 1.4 Händler-KPIs & Trennung Kausal- vs. Benchmark-Daten
+### 1.4 Österreichisches 20 % USt.-Handelsmodell
 
-- **Befund zuvor:** Die Beschriftungen im Händler-Cockpit wiesen teils irreführende Bezeichnungen („Netto vor 19% MwSt.“) auf.
+- **Befund zuvor:** Uneinheitliche Bezeichnungen („19 % MwSt.“) und additive Preisaufschläge.
 - **Umgesetzte Lösung:**
-  - KPI 1: Klar deklariert als _Bruttoumsatz (inkl. 20 % USt.)_ mit sekundärer Aufschlüsselung von Netto und Steuerbetrag.
-  - KPI 2: Klare Trennung von browsergenerierten Demo-Bestellungen und historischen Referenzaufträgen.
-  - KPI 4: Als _Sitzungen (Benchmark)_ transparent als statische Referenzdaten gekennzeichnet.
+  - Verbindliches Bruttopreissystem: Alle im Katalog, Konfigurator und Produktdetail angegebenen Preise sind Endpreise inklusive 20 % österreichischer Umsatzsteuer.
+  - Mathematisch präzise Cent-Berechnung: Bei einem Leuchtenpreis von 3.450,00 € bleibt der Endbetrag exakt 3.450,00 € (Netto: 2.875,00 €, 20 % USt.: 575,00 €).
+  - Alle Erwähnungen im Code, in UI-Komponenten und Produktdokumenten lauten einheitlich „20 % USt. (Österreich)“.
 
 ---
 
 ## 2. Test- und QA-Nachweise
 
-Die vollständige `pnpm qa`-Pipeline wurde fehlerfrei durchlaufen:
+### 2.1 Exakter Routenumfang (14 statische Routen)
 
-```text
-$ pnpm format:check
-Checking formatting...
-All matched files use Prettier code style!
+Das Projekt umfasst genau 14 öffentlich erreichbare statische Routen:
 
-$ node scripts/check-docs.mjs
-Documentation check passed for 21 required files.
+1. `/` — Startseite / Atelier-Manifest
+2. `/katalog` — Gesamtkatalog mit Materialfiltern & Schnellkauf
+3. `/produkte/korona-i` — Produktdetail KORONA I (Flagship Ring-Pendelleuchte)
+4. `/produkte/solis-disk` — Produktdetail SOLIS DISK (Akustik-Messing-Pendel)
+5. `/produkte/aura-column` — Produktdetail AURA COLUMN (Bodensäule)
+6. `/produkte/strata-grazer` — Produktdetail STRATA GRAZER (Wandfluter)
+7. `/produkte/kyoto-pendant` — Produktdetail KYOTO PENDANT (Washi-Papier & Holz)
+8. `/produkte/atelier-mono` — Produktdetail ATELIER MONO (Gussbronze Tischleuchte)
+9. `/produkte/lumen-globe` — Produktdetail LUMEN GLOBE (Mundgeblasene Opalglas-Sphäre)
+10. `/konfigurator` — Interaktiver Leuchten-Konfigurator mit Kelvin-Farbsimulation (2200K–4000K)
+11. `/warenkorb` — Warenkorb mit österreichischer USt.-Berechnung & Mengensteuerung
+12. `/kasse` — B2B Demo-Kasse & Rechnungsabwicklung
+13. `/atelier` — Handwerksphilosophie, Manufakturprozesse & Lichtlabor
+14. `/haendler` — B2B Händler-Cockpit mit 5 kausalen KPIs & Live-Lagerbestand
 
-$ eslint .
-(Clean, 0 errors, 0 warnings)
+### 2.2 Curated Review Screenshots (`artifacts/qa/review/`)
 
-$ tsc --noEmit
-(Clean, 0 type errors)
+Unter `artifacts/qa/review/` ist eine optimierte, versionskontrollierte Auswahl von 10 hochauflösenden Screenshots hinterlegt:
 
-$ playwright test
-37 passed (1.2m)
-- Inklusive axe-core Barrierefreiheitsprüfungen (WCAG 2.1 AA) auf allen 8 Routen
-- Inklusive 40 visueller Viewport-Screenshots (320px, 390px, 768px, 1440px, 1920px)
-- Inklusive End-to-End-Prüfungen:
-  * Vollständiger Kauf- und Causal-Merchant-Cockpit-Flow
-  * Konfigurator-Attribution auf physische Lager-SKUs
-  * Dynamischer Überbuchungsschutz
+1. `01-home-desktop-1440px.png` (Desktop 1440 px): Startseiten-Hero, Typografie, handwerkliche Lichtinszenierung und Bruttopreis-Transparenz.
+2. `02-home-mobile-390px.png` (Mobile 390 px): Responsive Navigation, mobile Lesbarkeit und kompaktes Layout ohne horizontale Umbrüche.
+3. `03-produkt-korona-i-desktop-1440px.png` (Desktop 1440 px): Detailfotografie, photometrische Spezifikationen (CRI Ra 98.4), Variantenauswahl und Atelier-Lagerbestand.
+4. `04-produkt-korona-i-mobile-390px.png` (Mobile 390 px): Mobile Produktauswahl mit touch-optimierten Variantenschaltern und Warenkorb-CTA.
+5. `05-konfigurator-desktop-1440px.png` (Desktop 1440 px): Dynamische Lichtfarben-Simulation (Kelvin), Ambiente-Modi, Oberflächen-Attribution und kalkulierte Serien-SKU.
+6. `06-konfigurator-mobile-390px.png` (Mobile 390 px): Touch-Bedienung des Kelvin-Schiebereglers und Parameter-Auswahl auf Mobilgeräten.
+7. `07-kasse-desktop-1440px.png` (Desktop 1440 px): Demo-Kassenformular, B2B-Rechnungskauf, vollständige USt.-Aufschlüsselung und Validierungsanzeigen.
+8. `08-kasse-mobile-390px.png` (Mobile 390 px): Barrierefreies einspaltiges Kassenformular mit validierten Formularfeldern.
+9. `09-haendler-desktop-1440px.png` (Desktop 1440 px): 5 kausale KPIs, SVG-Umsatzverlauf mit horizontaler Scrollbar, Live-Lagerabzug und Auftrags-Detailmodal.
+10. `10-haendler-mobile-390px.png` (Mobile 390 px): Responsive KPI-Karten, mobile Filterbedienung und touch-fähige Auftragstabelle.
 
-$ pnpm images:build && next build
-✓ Generating static pages using 11 workers (16/16) in 1763ms
-(Alle 16 statischen Seiten erfolgreich nach out/ exportiert)
+Zusätzlich liegen in `artifacts/qa/screenshots/` alle 70 Viewport-Screenshots (14 Routen × 5 Viewports: 320 px, 390 px, 768 px, 1280 px, 1440 px) der automatisierten Playwright-Generierung vor.
 
-$ playwright test --config playwright.static.config.ts (Wrangler Pages Dev)
-28 passed (19.5s)
-(Alle Routen, Reloads, Responsive-Bilder und Interaktionen auf Cloudflare Pages Runtime verifiziert)
-```
+### 2.3 Automatisierte Test-Pipelines
+
+#### Playwright Standard-Suite (`playwright.config.ts`)
+
+- **Barrierefreiheit (axe-core):** WCAG 2.1 AA auf allen 14 Routen vollständig bestanden (0 Violations).
+- **End-to-End-Regressionstests:**
+  1. `Complete Customer Order Flow & Live Merchant KPI Causality with Austrian 20% VAT`: Vollständiger Kaufprozess, KPI-Aktualisierung und Live-Bestandsabzug.
+  2. `Configurator maps finish selection to physical catalog stock in merchant inventory`: Korrekte Material-Attribution (`LW-KOR-STL-03`).
+  3. `Stock limit prevents overselling beyond physical availability`: Überbuchungsschutz auf Produktebene.
+  4. `Shared physical variant stock sums catalog and configurator positions strictly`: Summenprüfung über Katalog- & Konfigurator-Positionen; Erreichen des Limits (6 Stück); Blockade weiterer Einheiten im Konfigurator & Warenkorb; erfolgreicher Checkout und 0-Bestand im Dashboard.
+  5. `Overbooked checkout is rejected if shared stock limit is exceeded`: Abweisung überbuchter Warenkörbe an der Kasse.
+  6. `Reload-safe duplicate order prevention cleans stale cart on reload`: Simulation fehlgeschlagener Warenkorbleerung; Neuladen erkennt abgeschlossene Session und leert den Warenkorb.
+  7. `Merchant reset failure displays error alert and preserves existing data`: Simulation von Speicherfehlern; barrierefreie Fehlermeldung (`role="alert"`) und Schutz vorhandener Aufträge.
+
+#### Playwright Static-Export-Suite (`playwright.static.config.ts` via Wrangler Pages Dev)
+
+- **Routen & Reloads:** Alle 14 statischen Routen antworten mit HTTP 200 und überstehen einen direkten Page-Reload fehlerfrei.
+- **Responsive Bilder:** Alle lokalen Sharp-Bilder laden mit naturalWidth > 0 und validen `srcset`-Pfaden (`/media/responsive/`).
+- **Interaktiver E2E-Export-Test:** `static export cart, checkout and merchant cockpit integration under wrangler pages dev` führt einen realen Kauf über den statischen Cloudflare-Pages-Server aus und verifiziert die kausale Verbuchung im Händler-Cockpit.
 
 ---
 

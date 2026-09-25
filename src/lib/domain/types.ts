@@ -96,6 +96,7 @@ export interface Order {
   status: OrderStatus;
   origin: OrderOrigin;
   paymentMethod: 'Rechnung (Demo)';
+  cartSessionId?: string;
 }
 
 export type MerchantTimeframe = '7' | '30' | '90';

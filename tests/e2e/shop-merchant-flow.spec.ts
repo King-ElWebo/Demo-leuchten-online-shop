@@ -223,4 +223,239 @@ test.describe('LUMENWERK Studio — Interactive Customer & Merchant Cockpit Flow
     await page.goto('/warenkorb');
     await expect(page.getByText('KORONA I')).toBeVisible();
   });
+
+  test('Shared physical variant stock sums catalog and configurator positions strictly', async ({
+    page,
+  }) => {
+    // 1. Visit KORONA I (Messing base stock = 6)
+    await page.goto('/produkte/korona-i');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(
+      'KORONA I',
+    );
+
+    // Increase quantity to 4
+    const plusBtn = page.getByRole('button', { name: 'Menge erhöhen' });
+    await plusBtn.click();
+    await plusBtn.click();
+    await plusBtn.click();
+    await page.getByRole('button', { name: /In den Warenkorb/i }).click();
+    await expect(page.getByText(/in den Warenkorb gelegt/i)).toBeVisible();
+
+    // 2. Go to Configurator (default finish is Messing, sharing LW-KOR-BRS-01 physical stock)
+    await page.goto('/konfigurator');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(
+      'Leuchten-Konfigurator',
+    );
+
+    const configAddBtn = page.getByRole('button', {
+      name: /Konfiguration in den Warenkorb übernehmen/i,
+    });
+
+    // 4 units in cart, remaining stock is 2. Add 1st configured unit (total = 5)
+    await configAddBtn.click();
+    await expect(
+      page.getByText(/wurde dem Warenkorb hinzugefügt/i),
+    ).toBeVisible();
+
+    // Add 2nd configured unit (total = 6, exhausts all physical stock)
+    await configAddBtn.click();
+    await expect(
+      page.getByText(/wurde dem Warenkorb hinzugefügt/i),
+    ).toBeVisible();
+
+    // Attempt to add a 3rd configured unit: must be rejected
+    await configAddBtn.click();
+    const alertMsg = page.getByTestId('configurator-stock-error');
+    await expect(alertMsg).toBeVisible();
+    await expect(alertMsg).toContainText(
+      /bereits im Warenkorb oder im Atelier ausverkauft/i,
+    );
+
+    // 3. Go to Warenkorb to verify total and test updateQuantity limit
+    await page.goto('/warenkorb');
+    await expect(page.getByTestId('header-cart-badge')).toHaveText('6');
+
+    // Attempt to increase quantity of configured item in cart via "+"
+    const plusButtons = page.getByRole('button', {
+      name: /Menge für .* erhöhen/i,
+    });
+    await plusButtons.last().click();
+    const cartError = page.getByTestId('cart-quantity-error');
+    await expect(cartError).toBeVisible();
+    await expect(cartError).toContainText(
+      /Maximale Stückzahl für dieses Modell überschritten/i,
+    );
+
+    // 4. Complete checkout with full stock (6 units)
+    await page.goto('/kasse');
+    await page.locator('#customer-name').fill('Atelier Vollbestand');
+    await page.locator('#customer-email').fill('vollbestand@atelier.at');
+    await page.locator('#street').fill('Herrengasse 1');
+    await page.locator('#zip').fill('1010');
+    await page.locator('#city').fill('Wien');
+    await page
+      .getByRole('button', { name: /Verbindliche Demo-Bestellung aufgeben/i })
+      .click();
+
+    await expect(
+      page.getByText('Vielen Dank für Ihre Bestellung!'),
+    ).toBeVisible();
+
+    // 5. Merchant cockpit should show 0 remaining stock for Drehmessing
+    await page.goto('/haendler');
+    const inventoryTable = page.getByTestId('inventory-table');
+    const brsRow = inventoryTable.locator('tr', { hasText: 'LW-KOR-BRS-01' });
+    await expect(brsRow).toContainText('0');
+    await expect(brsRow).toContainText('Vergriffen');
+  });
+
+  test('Overbooked checkout is rejected if shared stock limit is exceeded', async ({
+    page,
+  }) => {
+    await page.goto('/kasse');
+
+    // Simulate an overbooked cart exceeding physical stock (5 catalog + 2 configured = 7 units > stock 6)
+    await page.evaluate(() => {
+      window.localStorage.setItem(
+        'lumenwerk_cart_v1',
+        JSON.stringify([
+          {
+            id: 'item-ovb-1',
+            productId: 'korona-i',
+            productSlug: 'korona-i',
+            productName: 'KORONA I',
+            variantId: 'standard-brass',
+            variantName: 'Drehmessing gebürstet',
+            sku: 'LW-KOR-BRS-01',
+            unitPriceEur: 3450,
+            quantity: 5,
+            image: '/media/korona-i.jpg',
+          },
+          {
+            id: 'item-ovb-2',
+            productId: 'korona-i',
+            productSlug: 'korona-i',
+            productName: 'KORONA I (Atelier-Konfiguration)',
+            variantId: 'custom-brass-2700k',
+            variantName: 'Drehmessing gebürstet (2700 K)',
+            sku: 'LW-KOR-2700K-BRS-PHS-150',
+            baseSku: 'LW-KOR-BRS-01',
+            baseVariantId: 'standard-brass',
+            unitPriceEur: 3450,
+            quantity: 2,
+            image: '/media/korona-i.jpg',
+          },
+        ]),
+      );
+    });
+
+    await page.reload();
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(
+      'Demo-Kasse',
+    );
+
+    await page.locator('#customer-name').fill('Überbuchung Test');
+    await page.locator('#customer-email').fill('ueberbuchung@test.at');
+    await page.locator('#street').fill('Teststraße 99');
+    await page.locator('#zip').fill('1020');
+    await page.locator('#city').fill('Wien');
+
+    await page
+      .getByRole('button', { name: /Verbindliche Demo-Bestellung aufgeben/i })
+      .click();
+
+    // Verify rejection alert
+    const errorBox = page.getByTestId('checkout-error');
+    await expect(errorBox).toBeVisible();
+    await expect(errorBox).toContainText(
+      /Der gemeinsame Lagerbestand für Ausführung „Handpoliertes Messing Natur“ reicht nicht aus/i,
+    );
+    // User remains on checkout page; no order placed
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(
+      'Demo-Kasse',
+    );
+  });
+
+  test('Reload-safe duplicate order prevention cleans stale cart on reload', async ({
+    page,
+  }) => {
+    // 1. Add item to cart
+    await page.goto('/produkte/korona-i');
+    await page.getByRole('button', { name: /In den Warenkorb/i }).click();
+    await expect(page.getByText(/in den Warenkorb gelegt/i)).toBeVisible();
+
+    // 2. Go to checkout
+    await page.goto('/kasse');
+    await page.locator('#customer-name').fill('Idempotenz Test');
+    await page.locator('#customer-email').fill('idempotenz@test.at');
+    await page.locator('#street').fill('Testgasse 5');
+    await page.locator('#zip').fill('1030');
+    await page.locator('#city').fill('Wien');
+
+    // 3. Monkey-patch localStorage.setItem to simulate saveCart([]) failing during checkout
+    await page.evaluate(() => {
+      const origSetItem = window.localStorage.setItem.bind(window.localStorage);
+      window.localStorage.setItem = (key: string, val: string) => {
+        // Block empty cart write to simulate quota or browser error
+        if (key === 'lumenwerk_cart_v1' && val === '[]') {
+          throw new Error('Simulated QuotaExceededError on cart clear');
+        }
+        return origSetItem(key, val);
+      };
+    });
+
+    // 4. Submit order (order succeeds, cartSessionId marked completed)
+    await page
+      .getByRole('button', { name: /Verbindliche Demo-Bestellung aufgeben/i })
+      .click();
+    await expect(
+      page.getByText('Vielen Dank für Ihre Bestellung!'),
+    ).toBeVisible();
+
+    // 5. Reload /warenkorb - loadCart() should detect completed cart session and purge it
+    await page.goto('/warenkorb');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(
+      'Ihr Warenkorb ist leer',
+    );
+  });
+
+  test('Merchant reset failure displays error alert and preserves existing data', async ({
+    page,
+  }) => {
+    await page.goto('/haendler');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(
+      'Kaufmännische Steuerung',
+    );
+
+    // Check baseline orders exist
+    const ordersTable = page.getByTestId('orders-table');
+    await expect(ordersTable).toContainText('LW-2026-9102');
+
+    // Monkey-patch removeItem to simulate storage failure during reset
+    await page.evaluate(() => {
+      const origRemove = window.localStorage.removeItem.bind(
+        window.localStorage,
+      );
+      window.localStorage.removeItem = (key: string) => {
+        if (key === 'lumenwerk_demo_orders_v1') {
+          throw new Error('Simulated disk reset failure');
+        }
+        return origRemove(key);
+      };
+    });
+
+    // Accept confirmation dialog
+    page.once('dialog', (dialog) => dialog.accept());
+
+    // Click reset
+    await page.getByRole('button', { name: 'Demo-Daten zurücksetzen' }).click();
+
+    // Verify error banner is visible with testid and role="alert"
+    const alertBox = page.getByTestId('haendler-reset-error');
+    await expect(alertBox).toBeVisible();
+    await expect(alertBox).toContainText(/Demo-Zurücksetzung fehlgeschlagen/i);
+
+    // Verify table still intact
+    await expect(ordersTable).toContainText('LW-2026-9102');
+  });
 });

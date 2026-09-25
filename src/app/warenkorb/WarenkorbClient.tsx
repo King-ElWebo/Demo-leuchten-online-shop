@@ -19,6 +19,17 @@ export function WarenkorbClient() {
     storageError,
   } = useShop();
 
+  const [quantityError, setQuantityError] = React.useState<string | null>(null);
+
+  const handleUpdateQuantity = (itemId: string, newQty: number) => {
+    setQuantityError(null);
+    const res = updateQuantity(itemId, newQty);
+    if (!res.success && res.error) {
+      setQuantityError(res.error);
+      setTimeout(() => setQuantityError(null), 5000);
+    }
+  };
+
   if (cart.length === 0) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8">
@@ -80,6 +91,16 @@ export function WarenkorbClient() {
       {storageError && (
         <div className="mt-6 rounded-sm border border-amber-300 bg-amber-50 p-4 text-xs font-mono text-amber-900">
           Hinweis: Lokale Speicherung im Browser eingeschränkt ({storageError}).
+        </div>
+      )}
+
+      {quantityError && (
+        <div
+          role="alert"
+          data-testid="cart-quantity-error"
+          className="mt-6 rounded-sm border border-rose-300 bg-rose-50 p-4 font-mono text-xs text-rose-900"
+        >
+          ✕ {quantityError}
         </div>
       )}
 
@@ -147,7 +168,7 @@ export function WarenkorbClient() {
                         <button
                           type="button"
                           onClick={() =>
-                            updateQuantity(item.id, item.quantity - 1)
+                            handleUpdateQuantity(item.id, item.quantity - 1)
                           }
                           className="px-2.5 py-1 text-stone-600 hover:bg-stone-200"
                           aria-label={`Menge für ${item.productName} verringern`}
@@ -160,7 +181,7 @@ export function WarenkorbClient() {
                         <button
                           type="button"
                           onClick={() =>
-                            updateQuantity(item.id, item.quantity + 1)
+                            handleUpdateQuantity(item.id, item.quantity + 1)
                           }
                           className="px-2.5 py-1 text-stone-600 hover:bg-stone-200"
                           aria-label={`Menge für ${item.productName} erhöhen`}

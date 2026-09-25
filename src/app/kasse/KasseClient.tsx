@@ -422,7 +422,11 @@ export function KasseClient() {
             </div>
 
             {formError && (
-              <div className="rounded-sm border border-rose-300 bg-rose-50 p-4 font-mono text-xs text-rose-800">
+              <div
+                role="alert"
+                data-testid="checkout-error"
+                className="rounded-sm border border-rose-300 bg-rose-50 p-4 font-mono text-xs text-rose-800"
+              >
                 {formError}
               </div>
             )}

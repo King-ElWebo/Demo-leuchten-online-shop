@@ -536,6 +536,7 @@ export function KonfiguratorClient() {
               <div
                 className="rounded-sm border border-red-300 bg-red-50 p-3.5 text-xs text-red-900"
                 role="alert"
+                data-testid="configurator-stock-error"
               >
                 {stockError}
               </div>

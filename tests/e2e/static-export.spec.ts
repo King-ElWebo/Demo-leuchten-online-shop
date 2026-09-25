@@ -33,16 +33,57 @@ for (const route of siteRoutes) {
   });
 }
 
-test('the unconfigured template link works from the static export', async ({
+test('static export cart, checkout and merchant cockpit integration under wrangler pages dev', async ({
   page,
 }) => {
-  await page.goto('/');
-  const configure = page.getByRole('link', { name: 'Configure the project' });
-  test.skip(
-    (await configure.count()) === 0,
-    'Configured projects replace this test with their key interactions.',
+  // 1. Visit product page from static build
+  await page.goto('/produkte/korona-i');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(
+    'KORONA I',
   );
-  await configure.click();
-  await expect(page).toHaveURL(/#configuration$/);
-  await expect(page.locator('#configuration')).toBeInViewport();
+
+  // 2. Add to cart
+  await page.getByRole('button', { name: /In den Warenkorb/i }).click();
+  await expect(page.getByText(/in den Warenkorb gelegt/i)).toBeVisible();
+  await expect(page.getByTestId('header-cart-badge')).toHaveText('1');
+
+  // 3. Navigate to Warenkorb
+  await page.goto('/warenkorb');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(
+    'Warenkorb',
+  );
+  await expect(page.getByText('KORONA I')).toBeVisible();
+
+  // 4. Navigate to Kasse
+  await page.goto('/kasse');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(
+    'Demo-Kasse',
+  );
+
+  // 5. Fill customer details
+  await page.locator('#customer-name').fill('Wrangler Static Test');
+  await page.locator('#customer-email').fill('static@wrangler-test.at');
+  await page.locator('#street').fill('Museumsplatz 1');
+  await page.locator('#zip').fill('1070');
+  await page.locator('#city').fill('Wien');
+
+  // 6. Submit demo order
+  await page
+    .getByRole('button', { name: /Verbindliche Demo-Bestellung aufgeben/i })
+    .click();
+  await expect(
+    page.getByText('Vielen Dank für Ihre Bestellung!'),
+  ).toBeVisible();
+  await expect(page.getByText(/Auftragsnummer: LW-2026-/i)).toBeVisible();
+
+  // 7. Verify Merchant Dashboard under static export
+  await page.goto('/haendler');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(
+    'Kaufmännische Steuerung',
+  );
+  const ordersTable = page.getByTestId('orders-table');
+  await expect(ordersTable).toContainText('Wrangler Static Test');
+  await expect(ordersTable).toContainText(
+    'Lokale Demo-Bestellung (Dieser Browser)',
+  );
 });

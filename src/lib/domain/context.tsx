@@ -14,9 +14,16 @@ import {
   loadOrders,
   saveLocalDemoOrder,
   resetDemoOrders,
+  getOrCreateCartSessionId,
+  rotateCartSessionId,
+  isCartSessionCompleted,
 } from './storage';
 import { baselineHistoricalOrders } from '@/data/merchant';
-import { getRemainingStock, getAvailableForCart } from './stock';
+import {
+  getRemainingStock,
+  getAvailableForCart,
+  validateCartStockAgainstRemaining,
+} from './stock';
 
 interface ShopContextType {
   cart: CartItem[];
@@ -102,6 +109,11 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
   const addToCart = (
     newItem: Omit<CartItem, 'id'>,
   ): { success: boolean; error?: string } => {
+    // If the active cart session was marked completed by a prior checkout, rotate to a fresh session
+    if (isCartSessionCompleted(getOrCreateCartSessionId())) {
+      rotateCartSessionId();
+    }
+
     const variantIdOrBase = newItem.baseVariantId || newItem.variantId;
     const availableForCart = getAvailableForCart(
       newItem.productId,
@@ -178,17 +190,14 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
       orders,
     );
 
-    // Calculate how many other items in cart occupy the same physical variant
-    const otherInCartQty = cart
-      .filter(
-        (i) =>
-          i.id !== cartItemId &&
-          ((targetItem.baseSku && i.baseSku === targetItem.baseSku) ||
-            (targetItem.sku && i.sku === targetItem.sku)),
-      )
-      .reduce((sum, i) => sum + i.quantity, 0);
-
-    const maxAllowed = Math.max(0, remainingStock - otherInCartQty);
+    // Calculate maximum allowed quantity considering other items sharing this physical variant
+    const maxAllowed = getAvailableForCart(
+      targetItem.productId,
+      variantIdOrBase,
+      cart,
+      orders,
+      cartItemId,
+    );
 
     if (newQty > maxAllowed) {
       return {
@@ -257,20 +266,24 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
       return { success: false, error: 'Der Warenkorb ist leer.' };
     }
 
-    // Verify stock for all items before accepting order
-    for (const item of cart) {
-      const variantIdOrBase = item.baseVariantId || item.variantId;
-      const remaining = getRemainingStock(
-        item.productId,
-        variantIdOrBase,
-        orders,
-      );
-      if (remaining < item.quantity) {
-        return {
-          success: false,
-          error: `Bestellabschluss nicht möglich: Der Lagerbestand für ${item.productName} (${item.variantName}) reicht nicht aus. Verfügbar: ${remaining} Stück, im Warenkorb: ${item.quantity} Stück.`,
-        };
-      }
+    const cartSessionId = getOrCreateCartSessionId();
+    if (isCartSessionCompleted(cartSessionId)) {
+      saveCart([]);
+      setCart([]);
+      return {
+        success: false,
+        error:
+          'Dieser Warenkorb wurde bereits in einer früheren Demo-Bestellung verbucht.',
+      };
+    }
+
+    // Verify aggregate physical stock across all cart positions before accepting order
+    const stockValidation = validateCartStockAgainstRemaining(cart, orders);
+    if (!stockValidation.valid) {
+      return {
+        success: false,
+        error: stockValidation.error,
+      };
     }
 
     const orderItems: OrderItem[] = cart.map((item) => ({
@@ -302,6 +315,7 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
       status: 'Eingegangen (Demo)',
       origin: 'local_demo',
       paymentMethod: 'Rechnung (Demo)',
+      cartSessionId,
     };
 
     const saveRes = saveLocalDemoOrder(newOrder);
@@ -323,6 +337,7 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
         'Bestellung erfolgreich angelegt, aber der lokale Warenkorb konnte im Browser nicht geleert werden.',
       );
     } else {
+      rotateCartSessionId();
       setStorageError(null);
     }
 

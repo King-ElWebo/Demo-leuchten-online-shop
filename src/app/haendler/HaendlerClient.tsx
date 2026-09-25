@@ -17,6 +17,7 @@ export function HaendlerClient() {
   >('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [resetNotice, setResetNotice] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
   const [hoveredPoint, setHoveredPoint] = useState<{
     dateLabel: string;
     revenueEur: number;
@@ -68,9 +69,19 @@ export function HaendlerClient() {
         'Möchten Sie alle im Browser erstellten Demo-Bestellungen zurücksetzen und die Standard-Beispieldaten wiederherstellen?',
       )
     ) {
-      resetDemoData();
-      setResetNotice(true);
-      setTimeout(() => setResetNotice(false), 4000);
+      const res = resetDemoData();
+      if (res.success) {
+        setResetNotice(true);
+        setResetError(null);
+        setTimeout(() => setResetNotice(false), 4000);
+      } else {
+        setResetError(
+          res.error ||
+            'Demo-Daten konnten im lokalen Speicher nicht zurückgesetzt werden.',
+        );
+        setResetNotice(false);
+        setTimeout(() => setResetError(null), 6000);
+      }
     }
   };
 
@@ -120,9 +131,22 @@ export function HaendlerClient() {
         </div>
 
         {resetNotice && (
-          <div className="mt-4 rounded-sm border border-emerald-300 bg-emerald-50 p-3 font-mono text-xs text-emerald-900 animate-in fade-in duration-200">
+          <div
+            role="status"
+            className="mt-4 rounded-sm border border-emerald-300 bg-emerald-50 p-3 font-mono text-xs text-emerald-900 animate-in fade-in duration-200"
+          >
             ✓ Demo-Bestellungen wurden zurückgesetzt. Die kaufmännischen
             Kennzahlen basieren wieder auf den 7 historischen Referenzaufträgen.
+          </div>
+        )}
+
+        {resetError && (
+          <div
+            role="alert"
+            data-testid="haendler-reset-error"
+            className="mt-4 rounded-sm border border-rose-300 bg-rose-50 p-3 font-mono text-xs text-rose-900 animate-in fade-in duration-200"
+          >
+            ✕ {resetError}
           </div>
         )}
       </div>
