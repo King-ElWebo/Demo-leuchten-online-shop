@@ -130,6 +130,37 @@ Umwandlung in ein klares, vertikales Buchformat. Touch-Ziele sind mindestens 44�
 - **May export permitted visual handoff material locally (`Yes` or `No`):** Yes
 - **Required concepts record (project and screen identifiers or links, prompts, selection rationale, implementation notes):** Recorded in [`concepts/README.md`](../../concepts/README.md) under Stitch project `projects/6052545706471218584`.
 
+## Gestaltungsentscheidungen der visuellen Überarbeitung (Architectural Chiaroscuro Overhaul)
+
+Um die Seite aus der schematischen Schablone generischer E-Commerce-Templates zu befreien, wurden folgende architektonische Gestaltungsentscheidungen getroffen und implementiert:
+
+1. **Hero-Inszenierung als architektonische Raumkomposition:**
+   - _Entscheidung:_ Befreiung von KORONA I aus dem repetitiven 2-Spalten-Kartenraster („Headline links, Kachel rechts“). Die Pendelleuchte wird als skulpturales Zentrum in einem tiefen Chiaroscuro-Raum (`#141416`) inszeniert, dessen bernsteinfarbener Lichtschein (`#E28C47`) die Raumgrenzen atmosphärisch moduliert.
+   - _Rationale:_ LUMENWERK versteht Licht als Baustoff. Eine Leuchte muss im Raum wirken und Licht werfen, statt in einer isolierten Produktkachel zu stehen.
+
+2. **Aufbrechen schematischer Dreierspalten & Reduktion repetitiver Chrome:**
+   - _Entscheidung:_ Beseitigung monotoner 3-Spalten-Boxen und ubiquitärer `border border-stone-200`-Kästen. Rigorose Reduktion der allgegenwärtigen `text-[10px] font-mono uppercase`-Pill-Badges.
+   - _Rationale:_ Wiederholen sich Rahmen und Mono-Labels auf jedem Element, verflacht die visuelle Hierarchie vollständig („Template-Look“). Durch den Wechsel von dichten und offenen Flächen entsteht ein redaktioneller Lesefluss.
+
+3. **Katalog mit kuratierter architektonischer Dramaturgie:**
+   - _Entscheidung:_ Überführung des 7-Produkte-Rasters in eine gegliederte Werkschau:
+     - _Flagship-Spotlight:_ Großformatige Querformat-Inszenierung der KORONA I mit vollständiger Spezifikation und Direktlink zur Konfiguration.
+     - _Asymmetrische Werkpaare:_ Gegenüberstellung von gegensätzlichen Skulpturen (z. B. monolithische Basalt-Tischleuchte SOLIS DISK neben flachem Wandgrazer STRATA GRAZER; vertikales Totem AURA COLUMN neben opaler Sphäre KYOTO PENDANT).
+     - _Architektonisches Intermezzo:_ Eine ruhige typografische Zäsur mit Lichtmanifest zur Kontemplation.
+   - _Rationale:_ Designobjekte verlangen nach individueller Maßstäblichkeit. Ein Richtstrahler (MONO ATELIER) und eine Raumskulptur (KORONA I) besitzen unterschiedliche architektonische Dimensionen und dürfen nicht in identischen quadratischen Boxen nivelliert werden.
+
+4. **Produktdetail: Materielle Sinnlichkeit & Lichtarchitektur:**
+   - _Entscheidung:_ Großzügige, atmosphärische Bildbühne; klar gegliederte Photometrie-Matrix mit exakten Kennzahlen (CRI Ra 98.4, R9 > 92, Abstrahlcharakteristik, DALI-2/Casambi); taktile Materialbeschreibungen der Patina.
+   - _Rationale:_ Architekten und Bauherren spezifizieren Leuchten anhand zweier Kriterien: physische Materialqualität bei Tag und photometrische Exzellenz bei Nacht.
+
+5. **Händler-Dashboard mit autoritativer Hierarchie:**
+   - _Entscheidung:_ Ersetzung der fünf gleichförmigen Kacheln durch eine zweistufige Hierarchie: Dominante Primärbühne für Bruttoumsatz und Bestellungen mit auffälliger Live-Delta-Anzeige für Browser-Demo-Bestellungen; darunter ein ruhiges Ledger-Band für sekundäre Betriebsdaten (Ø Bestellwert, Conversion Rate, Fertigungsstatus).
+   - _Rationale:_ Ein B2B-Werkzeug braucht klare kaufmännische Schwerpunkte. Umsatz und Bestellvolumen sind die operativen Leitmetriken; alles Weitere dient der Detailsteuerung.
+
+6. **Authentische Werkstattfotografie im Atelier-Bereich:**
+   - _Entscheidung:_ Austausch des fehlassoziierten Deckenstrahler-Bildes gegen die authentische Manufakturaufnahme `atelier-craft.jpg` (Handarbeit an der Drehbank mit Messingspänen und Werkzeugen).
+   - _Rationale:_ Das Manifest „Gegen die Vergänglichkeit des Industriellen“ erfordert echte handwerkliche Beweise statt unpassender Produktkacheln.
+
 ## Explicit anti-patterns
 
 - Kein generisches SaaS-Dashboard mit lila Farbverläufen und runden Pillen.

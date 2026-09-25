@@ -78,9 +78,11 @@ export default function AtelierPage() {
         <div className="lg:col-span-6">
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm border border-stone-200 bg-stone-100 shadow-sm">
             <Image
-              src="/media/atelier-mono.jpg"
-              alt="Handwerkliche Bearbeitung einer Messingfassung im Wiener Atelier"
+              src="/media/atelier-craft.jpg"
+              alt="Handwerkliche Bearbeitung einer Messingfassung auf der Drehbank im Wiener Atelier"
               fill
+              priority
+              loading="eager"
               sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"
             />

@@ -202,89 +202,133 @@ export function HaendlerClient() {
         </div>
       </div>
 
-      {/* 5 Causal KPI Metric Cards */}
-      <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
-        {/* KPI 1: Umsatz */}
-        <div className="rounded-sm border border-stone-200 bg-white p-5 shadow-xs">
-          <span className="font-mono text-xs uppercase tracking-wider text-stone-600">
-            Bruttoumsatz (inkl. 20 % USt.)
-          </span>
-          <p
-            className="mt-2 font-mono text-2xl font-bold text-[#1E1D1B]"
-            data-testid="kpi-revenue"
-          >
-            {formatPriceEur(metrics.totalRevenueEur)}
-          </p>
-          <p className="mt-1 font-mono text-[11px] text-stone-500">
-            Netto: {formatPriceEur(metrics.netRevenueEur)} · 20 % USt.
-          </p>
+      {/* Authoritative Two-Tier B2B KPI Cockpit */}
+      <div className="mt-8 space-y-4">
+        {/* Tier 1: Dominant Business Anchors (Gross Revenue & Order Count) */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          {/* Primary Lead Metric: Bruttoumsatz */}
+          <div className="lg:col-span-8 rounded-sm border border-stone-300 bg-white p-6 sm:p-8 shadow-xs flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs font-semibold uppercase tracking-wider text-stone-600">
+                  Bruttoumsatz (inkl. 20 % USt.)
+                </span>
+                <span className="rounded-xs bg-stone-100 px-2.5 py-0.5 font-mono text-[10px] text-stone-600 uppercase">
+                  Leitmetrik · Österreich
+                </span>
+              </div>
+              <p
+                className="mt-3 font-mono text-4xl sm:text-5xl font-bold tracking-tight text-[#1E1D1B]"
+                data-testid="kpi-revenue"
+              >
+                {formatPriceEur(metrics.totalRevenueEur)}
+              </p>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-stone-100 flex flex-wrap items-center justify-between gap-4 font-mono text-xs text-stone-600">
+              <span className="font-medium">
+                Netto: {formatPriceEur(metrics.netRevenueEur)} · 20 % USt.
+              </span>
+              {metrics.localOrdersCount > 0 ? (
+                <span className="inline-flex items-center gap-1.5 rounded-xs bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-emerald-800 font-semibold text-[11px]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                  <span>
+                    +{metrics.localOrdersCount} Demo-Auftrag/Aufträge aktiv
+                    verrechnet
+                  </span>
+                </span>
+              ) : (
+                <span className="text-stone-500 text-[11px]">
+                  Basiert auf {metrics.historicalOrdersCount} Referenzaufträgen
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Secondary Lead Metric: Bestellvolumen */}
+          <div className="lg:col-span-4 rounded-sm border border-stone-300 bg-white p-6 sm:p-8 shadow-xs flex flex-col justify-between">
+            <div>
+              <span className="font-mono text-xs font-semibold uppercase tracking-wider text-stone-600">
+                Bestellungen
+              </span>
+              <p
+                className="mt-3 font-mono text-4xl sm:text-5xl font-bold tracking-tight text-[#1E1D1B]"
+                data-testid="kpi-orders-count"
+              >
+                {metrics.ordersCount}
+              </p>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-stone-100 font-mono text-xs text-stone-600">
+              {metrics.localOrdersCount > 0 ? (
+                <div className="flex justify-between items-center text-[11px]">
+                  <span className="text-emerald-700 font-semibold">
+                    {metrics.localOrdersCount} Browser-Demo
+                  </span>
+                  <span>·</span>
+                  <span className="text-stone-600">
+                    {metrics.historicalOrdersCount} Referenzdaten
+                  </span>
+                </div>
+              ) : (
+                <span className="text-stone-500 text-[11px]">
+                  Zeitfenster: Letzte {metrics.timeframeDays} Tage
+                </span>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* KPI 2: Bestellungen */}
-        <div className="rounded-sm border border-stone-200 bg-white p-5 shadow-xs">
-          <span className="font-mono text-xs uppercase tracking-wider text-stone-600">
-            Bestellungen
-          </span>
-          <p
-            className="mt-2 font-mono text-2xl font-bold text-[#1E1D1B]"
-            data-testid="kpi-orders-count"
-          >
-            {metrics.ordersCount}
-          </p>
-          <p className="mt-1 font-mono text-[11px] text-stone-500">
-            {metrics.localOrdersCount > 0
-              ? `${metrics.localOrdersCount} Demo · ${metrics.historicalOrdersCount} Referenz`
-              : `in den letzten ${metrics.timeframeDays} Tagen`}
-          </p>
-        </div>
+        {/* Tier 2: Secondary Operational Telemetry Ledger */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* KPI 3: Ø Bestellwert (AOV) */}
+          <div className="rounded-sm border border-stone-200 bg-stone-50/70 p-4 shadow-xs">
+            <span className="font-mono text-xs uppercase tracking-wider text-stone-600">
+              Ø Bestellwert (AOV)
+            </span>
+            <p
+              className="mt-1 font-mono text-xl font-bold text-[#1E1D1B]"
+              data-testid="kpi-aov"
+            >
+              {formatPriceEur(metrics.averageOrderValueEur)}
+            </p>
+            <p className="mt-0.5 font-mono text-[10px] text-stone-500">
+              Umsatz / Aufträge
+            </p>
+          </div>
 
-        {/* KPI 3: AOV */}
-        <div className="rounded-sm border border-stone-200 bg-white p-5 shadow-xs">
-          <span className="font-mono text-xs uppercase tracking-wider text-stone-600">
-            Ø Bestellwert (AOV)
-          </span>
-          <p
-            className="mt-2 font-mono text-2xl font-bold text-[#1E1D1B]"
-            data-testid="kpi-aov"
-          >
-            {formatPriceEur(metrics.averageOrderValueEur)}
-          </p>
-          <p className="mt-1 font-mono text-[11px] text-stone-500">
-            Umsatz / Aufträge
-          </p>
-        </div>
+          {/* KPI 4: Conversion Rate */}
+          <div className="rounded-sm border border-stone-200 bg-stone-50/70 p-4 shadow-xs">
+            <span className="font-mono text-xs uppercase tracking-wider text-stone-600">
+              Conversion Rate (CR)
+            </span>
+            <p
+              className="mt-1 font-mono text-xl font-bold text-[#8F4400]"
+              data-testid="kpi-conversion-rate"
+            >
+              {formatPercent(metrics.conversionRatePercent)}
+            </p>
+            <p className="mt-0.5 font-mono text-[10px] text-stone-500">
+              Aufträge / Sessions
+            </p>
+          </div>
 
-        {/* KPI 4: Besucher / Sessions */}
-        <div className="rounded-sm border border-stone-200 bg-white p-5 shadow-xs">
-          <span className="font-mono text-xs uppercase tracking-wider text-stone-600">
-            Sitzungen (Benchmark)
-          </span>
-          <p
-            className="mt-2 font-mono text-2xl font-bold text-[#1E1D1B]"
-            data-testid="kpi-sessions"
-          >
-            {metrics.sessionsCount.toLocaleString('de-DE')}
-          </p>
-          <p className="mt-1 font-mono text-[11px] text-stone-500">
-            {metrics.uniqueVisitorsCount.toLocaleString('de-DE')} Unique Users
-            (Referenz)
-          </p>
-        </div>
-
-        {/* KPI 5: Conversion Rate */}
-        <div className="rounded-sm border border-stone-200 bg-white p-5 shadow-xs">
-          <span className="font-mono text-xs uppercase tracking-wider text-stone-600">
-            Conversion Rate (CR)
-          </span>
-          <p
-            className="mt-2 font-mono text-2xl font-bold text-[#8F4400]"
-            data-testid="kpi-conversion-rate"
-          >
-            {formatPercent(metrics.conversionRatePercent)}
-          </p>
-          <p className="mt-1 font-mono text-[11px] text-stone-500">
-            Aufträge / Sessions
-          </p>
+          {/* KPI 5: Sitzungen / Benchmark */}
+          <div className="rounded-sm border border-stone-200 bg-stone-50/70 p-4 shadow-xs">
+            <span className="font-mono text-xs uppercase tracking-wider text-stone-600">
+              Sitzungen (Benchmark)
+            </span>
+            <p
+              className="mt-1 font-mono text-xl font-bold text-[#1E1D1B]"
+              data-testid="kpi-sessions"
+            >
+              {metrics.sessionsCount.toLocaleString('de-DE')}
+            </p>
+            <p className="mt-0.5 font-mono text-[10px] text-stone-500">
+              {metrics.uniqueVisitorsCount.toLocaleString('de-DE')} Unique Users
+              (Referenz)
+            </p>
+          </div>
         </div>
       </div>
 

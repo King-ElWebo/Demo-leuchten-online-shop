@@ -93,25 +93,68 @@ export function ProductDetailClient({
 
       {/* Main Showcase Grid */}
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
-        {/* Left Column: Product Image with Frame */}
+        {/* Left Column: Spatial Product Stage with Atmospheric Depth */}
         <div className="lg:col-span-7">
           <div className="sticky top-28 space-y-6">
-            <div className="relative aspect-square w-full overflow-hidden rounded-sm border border-stone-200 bg-white shadow-sm">
+            {/* Architectural Spatial Stage */}
+            <div className="relative aspect-square w-full overflow-hidden rounded-sm border border-stone-800 bg-[#141416] shadow-xl">
+              {/* Warm light bloom behind product */}
+              <div
+                className="pointer-events-none absolute -top-20 -right-20 h-80 w-80 rounded-full bg-amber-500/15 blur-[100px]"
+                aria-hidden="true"
+              />
               <Image
                 src={product.image}
                 alt={`${product.name} – ${product.material}`}
                 fill
                 priority
+                loading="eager"
                 sizes="(min-width: 1024px) 58vw, 100vw"
                 className="object-cover transition-transform duration-700 hover:scale-102"
               />
-              <div className="absolute top-4 left-4 rounded-xs bg-[#1E1D1B]/85 px-3 py-1 font-mono text-xs text-stone-200 uppercase">
+              <div className="absolute top-4 left-4 rounded-xs bg-[#1E1D1B]/90 px-3 py-1 font-mono text-xs text-stone-200 uppercase tracking-wider backdrop-blur-xs">
                 {product.categoryLabel}
+              </div>
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-[11px] font-mono text-stone-300 bg-stone-900/80 px-3 py-1.5 rounded-xs backdrop-blur-xs border border-stone-800">
+                <span>{product.dimensions.split('(')[0]}</span>
+                <span className="text-amber-400 font-semibold">
+                  CRI Ra 98+ Vollspektrum
+                </span>
+              </div>
+            </div>
+
+            {/* Material & Craftsmanship Inspection Panel */}
+            <div className="rounded-sm border border-stone-200 bg-white p-5 space-y-3 shadow-xs">
+              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#8F4400]">
+                Materialqualität & Haptik
+              </span>
+              <p className="text-xs text-stone-700 leading-relaxed">
+                Gefertigt aus massivem Vollmetall und handveredeltem Glas. Jedes
+                Exemplar wird mit individueller Seriennummer versehen und vor
+                dem Versand im photometrischen Labor in Wien vermessen.
+              </p>
+              <div className="grid grid-cols-2 gap-3 pt-2 font-mono text-[11px] text-stone-600 border-t border-stone-100">
+                <div>
+                  <span className="block text-stone-600 uppercase">
+                    Verbindungstechnik
+                  </span>
+                  <span className="font-semibold text-[#1E1D1B]">
+                    Metrische Verschraubung
+                  </span>
+                </div>
+                <div>
+                  <span className="block text-stone-600 uppercase">
+                    Reparierbarkeit
+                  </span>
+                  <span className="font-semibold text-[#1E1D1B]">
+                    25 Jahre Ersatzteilgarantie
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Quick Link to Interactive Light Configurator */}
-            <div className="rounded-sm border border-stone-200 bg-white p-5 flex items-center justify-between">
+            <div className="rounded-sm border border-stone-200 bg-stone-50 p-5 flex items-center justify-between">
               <div>
                 <p className="font-serif text-sm font-medium text-[#1E1D1B]">
                   Lichtstimmung digital testen
@@ -123,7 +166,7 @@ export function ProductDetailClient({
               </div>
               <Link
                 href="/konfigurator"
-                className="rounded-sm bg-stone-100 px-3.5 py-2 font-mono text-xs font-semibold text-[#1E1D1B] hover:bg-[#8F4400] hover:text-white transition-colors shrink-0 ml-4"
+                className="rounded-sm bg-[#1E1D1B] px-4 py-2 font-mono text-xs font-semibold text-white hover:bg-[#8F4400] transition-colors shrink-0 ml-4"
               >
                 Konfigurator →
               </Link>
@@ -137,15 +180,15 @@ export function ProductDetailClient({
             <span className="font-mono text-xs font-semibold tracking-widest text-[#8F4400] uppercase">
               Handgefertigte Kleinserie
             </span>
-            <h1 className="mt-2 font-serif text-3xl sm:text-4xl font-normal text-[#1E1D1B]">
+            <h1 className="mt-2 font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-[#1E1D1B] tracking-tight">
               {product.name}
             </h1>
-            <p className="mt-2 font-mono text-xs text-stone-600 uppercase tracking-wide">
+            <p className="mt-2 font-mono text-xs text-[#8F4400] font-medium tracking-wide">
               {product.material}
             </p>
 
             <div className="mt-4 flex items-baseline gap-4">
-              <span className="font-mono text-2xl font-bold text-[#1E1D1B]">
+              <span className="font-mono text-3xl font-bold text-[#1E1D1B]">
                 {formatPriceEur(currentPriceEur)}
               </span>
               <span className="font-mono text-xs text-stone-600">
@@ -329,9 +372,15 @@ export function ProductDetailClient({
 
           {/* Photometric Technical Specifications Table */}
           <div className="border-t border-stone-200 pt-8 space-y-4">
-            <h2 className="font-mono text-xs font-semibold uppercase tracking-widest text-[#1E1D1B]">
-              Lichttechnische Spezifikation
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-mono text-xs font-semibold uppercase tracking-widest text-[#1E1D1B]">
+                Lichttechnische Spezifikation für Planer
+              </h2>
+              <span className="font-mono text-[11px] text-[#8F4400]">
+                DALI-2 / Casambi
+              </span>
+            </div>
+
             <div className="overflow-hidden rounded-sm border border-stone-200 bg-white">
               <table className="w-full text-left font-mono text-xs">
                 <tbody className="divide-y divide-stone-100">
@@ -438,7 +487,7 @@ export function ProductDetailClient({
       {/* Related Products Recommendation */}
       {relatedProducts.length > 0 && (
         <div className="mt-24 border-t border-stone-300 pt-12">
-          <h2 className="font-serif text-2xl font-normal text-[#1E1D1B]">
+          <h2 className="font-serif text-2xl sm:text-3xl font-normal text-[#1E1D1B]">
             Verwandte Lichtarchitekturen
           </h2>
           <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">

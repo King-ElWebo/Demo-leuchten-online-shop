@@ -111,5 +111,58 @@ Zusätzlich liegen in `artifacts/qa/screenshots/` alle 70 Viewport-Screenshots (
 ## 3. Statischer Export & Cloudflare Pages Konformität
 
 - **Ausgabeverzeichnis:** `out/`
-- **Lokale Bilder:** 80 responsive WebP/JPEG-Varianten über Sharp generiert und via `src/lib/image-loader.ts` referenziert; kein Remote-CDN oder Server-Image-Optimizer notwendig.
+- **Lokale Bilder:** 90 responsive WebP/JPEG-Varianten über Sharp generiert (inklusive des neuen Manufaktur-Bildes `atelier-craft.jpg`) und via `src/lib/image-loader.ts` referenziert; kein Remote-CDN oder Server-Image-Optimizer notwendig.
 - **Routen:** Alle dynamischen Pfade (`/produkte/[slug]`) vollständig über `generateStaticParams()` statisch gerendert.
+
+---
+
+## 4. Gestalterische Überarbeitung (Architectural Chiaroscuro Overhaul) & Evidenz
+
+### 4.1 Ursachenanalyse & Behebung des „1 Issue“-Dev-Indicators
+
+- **Befund:** Im Entwicklungsmodus erschien in Next.js 16 ein Indikator „1 Issue“. Eine gezielte Untersuchung der Browserkonsole und Netzwerkanfragen via Playwright deckte auf:
+  - Next.js 16 gibt eine Performance-Meldung für Above-the-Fold-Bilder aus: `Image with src "/media/korona-i.jpg" was detected as the Largest Contentful Paint (LCP). Please add the loading="eager" property if this image is above the fold.`
+  - Zudem war für das Bild in „Materialität & Fertigung“ kein passendes Atelier-Drehbank-Bild hinterlegt, wodurch lazy loading mit `naturalWidth: 0` vor dem Scrollen auftrat.
+- **Lösung:**
+  - Erstellung eines authentischen handwerklichen Atelier-Fotos (`public/media/atelier-craft.jpg`: Bearbeitung einer Messingfassung auf der Drehbank im Atelier) und Generierung aller 10 responsiven WebP-Varianten.
+  - Setzen von `priority` und `loading="eager"` für alle LCP- und Above-the-Fold-Bilder (`page.tsx`, `KatalogClient.tsx`, `ProductDetailClient.tsx`, `atelier/page.tsx`).
+  - Browserprüfung: Dev-Indikator meldet 0 Fehler, Konsole ist sauber (0 Warnings, 0 Errors, keine fehlgeschlagenen Requests).
+
+### 4.2 Eigenständige visuelle Sprache (Architectural Chiaroscuro)
+
+- **Startseite (`/`):**
+  - Befreiung aus dem generischen 2-Spalten-Template: Großzügige architektonische Raum-Inszenierung im tiefen Dunkelraum (`#141416`) mit warmem Licht-Bloom, asymmetrischer Anordnung und subtiler Telemetrie (CRI Ra 98+, Abmessungen).
+  - Skulpturaler Werk-Fokus mit Leit-Exponat SOLIS DISK im Breitformat und asymmetrischen Paarungen (STRATA GRAZER & KYOTO PENDANT), anstatt stereotyper 3-Spalten-Karten.
+  - Vollständige Einbindung des neuen Atelier-Handwerksbildes `atelier-craft.jpg` in „Materialität & Fertigung“.
+- **Katalog (`/katalog`):**
+  - Kuratierte Ausstellungsdramaturgie mit Leit-Skulptur KORONA I im prominenten Studio-Spotlight.
+  - Skulpturale Rhythmisierung in asymmetrischen Duos und Typografie-Manifesten zwischen den Objekten.
+- **Produktdetail (`/produkte/[slug]`):**
+  - Räumliche Lichtbühne mit dunkler Rahmung, haptischer Materialinspektion und strukturierter Lichtplaner-Spezifikation (DALI-2, Casambi, CRI Ra 98.4, R9 > 92).
+- **Händler-Dashboard (`/haendler`):**
+  - Ersatz der fünf gleichförmigen Kacheln durch eine klare zweistufige Hierarchie: Dominante Tier-1-Primärkarten für Bruttoumsatz und Bestellungen mit Live-Bestelldelta, gefolgt von einem kompakten Buchungsjournal für AOV, Conversion Rate und Sitzungen.
+
+### 4.3 Vorher-/Nachher-Vergleichsbildnachweise (`artifacts/qa/review/`)
+
+- **Vorher (`artifacts/qa/review/before/`):**
+  - `home-desktop-1440px.png` & `home-mobile-390px.png`
+  - `katalog-desktop-1440px.png` & `katalog-mobile-390px.png`
+  - `produkt-korona-i-desktop-1440px.png` & `produkt-korona-i-mobile-390px.png`
+  - `haendler-desktop-1440px.png` & `haendler-mobile-390px.png`
+- **Nachher (`artifacts/qa/review/after/`):**
+  - `01-home-desktop-1440px.png` & `01-home-mobile-390px.png`
+  - `02-katalog-desktop-1440px.png` & `02-katalog-mobile-390px.png`
+  - `03-produkt-korona-i-desktop-1440px.png` & `03-produkt-korona-i-mobile-390px.png`
+  - `04-haendler-desktop-1440px.png` & `04-haendler-mobile-390px.png`
+
+---
+
+## 5. Finale QA-Suite Bestätigung (`pnpm qa`)
+
+- **Prettier:** `prettier --check .` (0 Formatierungsfehler)
+- **Dokumentations-Integrität:** `node scripts/check-docs.mjs` (21/21 Dateien gültig)
+- **ESLint:** `eslint .` (0 Linting-Warnungen oder -Fehler)
+- **TypeScript:** `tsc --noEmit` (0 Typfehler)
+- **Playwright E2E-Tests:** 45/45 Tests bestanden (inkl. Barrierefreiheit, Warenkorb, Konfigurator, Checkout, Händler-Dashboard)
+- **Static Export Build:** 16/16 statische HTML-Seiten erfolgreich in `out/` generiert
+- **Wrangler Pages Dev Tests:** 30/30 Tests bestanden unter lokalem Cloudflare Pages Server
