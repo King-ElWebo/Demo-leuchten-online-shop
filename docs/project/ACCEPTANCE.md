@@ -1,48 +1,55 @@
 # Acceptance contract
 
-Specification status: TEMPLATE_NOT_CONFIGURED
+Specification status: READY
 
-This document owns the completion and verification criteria for the configured showcase. It verifies the scope, visual direction, and content defined by the other project specifications; it must not silently introduce, expand, or contradict product scope. If a proposed check requires new functionality, first update the owning specification explicitly. Replace or extend project-specific markers, set concrete viewport values, then change the status to `READY`.
-
-The untouched master repository is a special maintenance mode: its intentional `[REQUIRED: replace before production run]` markers and `TEMPLATE_NOT_CONFIGURED` status do not fail `pnpm qa`. A production showcase may not claim completion until all project documents are `READY` and no required markers remain.
+This document owns the completion and verification criteria for the configured showcase. It verifies the scope, visual direction, and content defined by the other project specifications; it must not silently introduce, expand, or contradict product scope. If a proposed check requires new functionality, first update the owning specification explicitly.
 
 ## Project-specific acceptance
 
-- [ ] [REQUIRED: replace before production run]
-- [ ] Both signature moments in [`DESIGN.md`](DESIGN.md) work at their specified routes, viewports, input modes, and reduced-motion setting.
-- [ ] The final result conforms to the brand thesis, composition grammar, typography, image direction, density, and responsive art direction in [`DESIGN.md`](DESIGN.md).
+- [ ] **Vollständiger E-Commerce & B2B Durchstich:**
+      Produkt im Katalog finden (`/katalog`) → Im Konfigurator (`/konfigurator`) anpassen (Material, Kelvin) → In den Warenkorb legen (`/warenkorb`) → Demo-Bestellung aufgeben (`/kasse`) → Generierte Bestellung in der Händleransicht (`/haendler`) verifizieren → Kausale Veränderung der KPIs (Bestellwert, Anzahl, AOV, Conversion-Rate) überprüfen → Reload-Persistenz der Demo-Order prüfen → Demo-Reset ausführen und Wiederherstellung der Ausgangsdaten verifizieren.
+- [ ] **Leuchten-Konfigurator (Signature Moment 1):**
+      Echtzeit-Aktualisierung von Material, Farbtemperatur (2200K–4000K), Lichtschein-Vorschau, dynamischer SKU und Gesamtpreis. Funktionierender Tag-/Dämmerungs-Umschalter und fehlerfreies Hinzufügen der konfigurierten Variante in den Warenkorb.
+- [ ] **Händleransicht & KPI-Kausalität (Signature Moment 2):**
+      Kennzahlen basieren streng auf den Datenpunkten (Bestellungen und Sitzungen) des jeweils gewählten Zeitraums (7, 30, 90 Tage). Klare optische Trennung zwischen historischen Beispieldaten und lokalen Demo-Bestellungen dieses Browsers.
+- [ ] **Fehler- und Grenzfall-Handling:**
+      Reaktive Behandlung leerer Suchergebnisse im Katalog mit Reset-Möglichkeit. Verhinderung von Mengen über dem lokalen Lagerbestand im Warenkorb. Honest Handling von LocalStorage-Fehlern ohne falsche Erfolgsmeldungen.
+- [ ] **Statische Export-Architektur:**
+      Produktdetailrouten (`/produkte/[slug]`) werden über `generateStaticParams()` zur Build-Zeit statisch generiert; die Website exportiert vollständig nach `out/` und läuft autonom unter `wrangler pages dev out`.
+- [ ] **Design-Authentizität & Barrierefreiheit:**
+      Keine generischen KI-Themes. Striktes Einhalten der architektonischen Chiaroscuro-Ästhetik (`#F7F5F0`, `#141416`, `#E28C47`), Axe-Core 0 serious/critical violations, volle Tastaturbedienbarkeit mit sichtbarem Fokus, Respektierung von `prefers-reduced-motion`.
 
 ## Routes and behavior
 
 - [ ] Every route in [`SITE.md`](SITE.md) exists and is listed in `tests/e2e/routes.ts`.
 - [ ] Every route loads directly with a successful response.
 - [ ] Global, contextual, mobile, and footer navigation reaches the intended destination.
-- [ ] Every visible control has intentional behavior; no placeholder `#` actions remain unless documented as intentional.
+- [ ] Every visible control has intentional behavior; no placeholder `#` actions remain.
 - [ ] Every project-specific interaction produces its documented result.
 - [ ] Browser back/forward behavior is coherent where navigation state is involved.
 - [ ] Failure, empty, not-found, loading, or fallback states exist wherever the route actually needs them.
 
 ## Responsive layout
 
-Default review viewports are editable per project:
+Default review viewports:
 
-| Review target | Default viewport | Project value                             |
-| ------------- | ---------------- | ----------------------------------------- |
-| Small mobile  | 320 × 568        | [REQUIRED: replace before production run] |
-| Modern mobile | 390 × 844        | [REQUIRED: replace before production run] |
-| Tablet        | 768 × 1024       | [REQUIRED: replace before production run] |
-| Laptop        | 1440 × 1000      | [REQUIRED: replace before production run] |
-| Large desktop | 1920 × 1080      | [REQUIRED: replace before production run] |
+| Review target | Default viewport | Project value |
+| ------------- | ---------------- | ------------- |
+| Small mobile  | 320 × 568        | 320 × 568     |
+| Modern mobile | 390 × 844        | 390 × 844     |
+| Tablet        | 768 × 1024       | 768 × 1024    |
+| Laptop        | 1440 × 1000      | 1440 × 1000   |
+| Large desktop | 1920 × 1080      | 1920 × 1080   |
 
 - [ ] Desktop layouts preserve the intended hierarchy, rhythm, image crops, and signature moments.
 - [ ] Tablet layouts transform as specified rather than merely shrinking desktop.
 - [ ] Mobile layouts are deliberately art-directed for priority, rhythm, crop, and touch.
-- [ ] At least one intermediate width between each major breakpoint was spot-checked.
+- [ ] At least one intermediate width between each major breakpoint was spot-checked (e.g. 1024px).
 - [ ] No required viewport has horizontal document overflow.
 - [ ] No unintended overlaps occur.
 - [ ] No critical text, controls, focus indicator, or media is clipped.
 - [ ] No image is broken, visibly distorted, or assigned an unintended crop.
-- [ ] No unresolved placeholder content or asset remains in a `READY` project.
+- [ ] No unresolved placeholder content or asset remains.
 
 ## Browser health
 
@@ -61,8 +68,8 @@ Default review viewports are editable per project:
 - [ ] Links and buttons match their behavior.
 - [ ] Landmarks and heading order communicate the page structure.
 - [ ] Every informative image has meaningful context-specific alt text; decorative images have empty alt text.
-- [ ] Text, controls, focus indicators, and essential graphics received a contrast review.
-- [ ] Forms, if present, have persistent labels, useful instructions, and clear error states.
+- [ ] Text, controls, focus indicators, and essential graphics received a contrast review (> 4.5:1 / > 10:1).
+- [ ] Forms have persistent labels, useful instructions, and clear error states.
 - [ ] Essential information and actions do not depend on hover.
 - [ ] Touch devices have an intentional alternative for hover-specific enhancement.
 - [ ] `prefers-reduced-motion` removes large spatial movement and non-essential choreography.
@@ -92,7 +99,7 @@ Default review viewports are editable per project:
 
 ## Visual review and final polish
 
-- [ ] Screenshots were captured and visually reviewed at every required viewport.
+- [ ] Screenshots were captured and visually reviewed at every required viewport (320, 390, 768, 1024, 1440, 1920).
 - [ ] Typography, whitespace, density, alignment, image crops, and responsive composition were refined after review.
 - [ ] A dedicated motion pass was completed in the browser.
 - [ ] A dedicated accessibility pass was completed.

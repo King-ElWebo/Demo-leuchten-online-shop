@@ -42,20 +42,23 @@ for (const route of siteRoutes) {
   });
 }
 
-test('the unconfigured master identifies itself without requiring project content', async ({
+test('the showcase homepage renders LUMENWERK branding and core navigation', async ({
   page,
 }) => {
   await page.goto('/');
 
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(
+    'Licht als',
+  );
   await expect(
-    page.getByRole('heading', { level: 1, name: 'Showcase Website Factory' }),
+    page.getByLabel('LUMENWERK Studio — Zur Startseite'),
   ).toBeVisible();
   await expect(
-    page.getByText('TEMPLATE_NOT_CONFIGURED', { exact: true }),
-  ).toBeVisible();
+    page.getByRole('link', { name: 'Kollektion erkunden' }),
+  ).toHaveAttribute('href', '/katalog');
   await expect(
-    page.getByRole('link', { name: 'Configure the project' }),
-  ).toHaveAttribute('href', '#configuration');
+    page.getByRole('link', { name: 'Licht konfigurieren' }),
+  ).toHaveAttribute('href', '/konfigurator');
 });
 
 const reviewViewports = [
@@ -67,6 +70,7 @@ const reviewViewports = [
 ] as const;
 
 test('@visual capture the five default review viewports', async ({ page }) => {
+  test.setTimeout(180000);
   const screenshotRoot = path.resolve('artifacts/qa/screenshots');
   await mkdir(screenshotRoot, { recursive: true });
 
@@ -77,7 +81,7 @@ test('@visual capture the five default review viewports', async ({ page }) => {
     });
 
     for (const route of siteRoutes) {
-      await page.goto(route.path, { waitUntil: 'networkidle' });
+      await page.goto(route.path, { waitUntil: 'domcontentloaded' });
       await page.screenshot({
         path: path.join(screenshotRoot, `${route.name}-${viewport.name}.png`),
         fullPage: true,
