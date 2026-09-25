@@ -15,7 +15,8 @@ import {
   saveLocalDemoOrder,
   resetDemoOrders,
 } from './storage';
-import { products } from '@/data/products';
+import { baselineHistoricalOrders } from '@/data/merchant';
+import { getRemainingStock, getAvailableForCart } from './stock';
 
 interface ShopContextType {
   cart: CartItem[];
@@ -32,8 +33,8 @@ interface ShopContextType {
     cartItemId: string,
     quantity: number,
   ) => { success: boolean; error?: string };
-  removeFromCart: (cartItemId: string) => void;
-  clearCart: () => void;
+  removeFromCart: (cartItemId: string) => { success: boolean; error?: string };
+  clearCart: () => { success: boolean; error?: string };
   orders: Order[];
   createDemoOrder: (details: {
     customerName: string;
@@ -42,7 +43,7 @@ interface ShopContextType {
     shippingAddress: string;
     shippingSpeed: string;
   }) => { success: boolean; order?: Order; error?: string };
-  resetDemoData: () => void;
+  resetDemoData: () => { success: boolean; error?: string };
   refreshOrders: () => void;
 }
 
@@ -50,7 +51,10 @@ const ShopContext = createContext<ShopContextType | undefined>(undefined);
 
 export function ShopProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [orders, setOrders] = useState<Order[]>([]);
+  // Initialize with baseline historical orders immediately to prevent 0 € / empty state flash during SSR/prerender
+  const [orders, setOrders] = useState<Order[]>(() => [
+    ...baselineHistoricalOrders,
+  ]);
   const [storageError, setStorageError] = useState<string | null>(null);
 
   // Initialize from storage
@@ -78,29 +82,48 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     return cart.reduce((sum, item) => sum + item.quantity, 0);
   }, [cart]);
 
-  const cartSubtotalEur = useMemo(() => {
+  // Gross total: Advertised catalog prices are final customer prices (Bruttopreise inkl. 20 % USt.)
+  const cartTotalEur = useMemo(() => {
     return cart.reduce(
       (sum, item) => sum + item.unitPriceEur * item.quantity,
       0,
     );
   }, [cart]);
 
-  // 20% Austrian VAT standard rate
-  const cartTaxEur = useMemo(() => {
-    return Math.round(cartSubtotalEur * 0.2 * 100) / 100;
-  }, [cartSubtotalEur]);
+  // 20% Austrian VAT standard rate: Netto = Gross / 1.20, Tax = Gross - Netto
+  const cartSubtotalEur = useMemo(() => {
+    return Math.round((cartTotalEur / 1.2) * 100) / 100;
+  }, [cartTotalEur]);
 
-  const cartTotalEur = useMemo(() => {
-    return Math.round((cartSubtotalEur + cartTaxEur) * 100) / 100;
-  }, [cartSubtotalEur, cartTaxEur]);
+  const cartTaxEur = useMemo(() => {
+    return Math.round((cartTotalEur - cartSubtotalEur) * 100) / 100;
+  }, [cartTotalEur, cartSubtotalEur]);
 
   const addToCart = (
     newItem: Omit<CartItem, 'id'>,
   ): { success: boolean; error?: string } => {
-    // Find stock limit
-    const prod = products.find((p) => p.id === newItem.productId);
-    const variant = prod?.variants.find((v) => v.id === newItem.variantId);
-    const availableStock = variant?.stock ?? prod?.stock ?? 10;
+    const variantIdOrBase = newItem.baseVariantId || newItem.variantId;
+    const availableForCart = getAvailableForCart(
+      newItem.productId,
+      variantIdOrBase,
+      cart,
+      orders,
+    );
+
+    if (newItem.quantity > availableForCart) {
+      const remaining = getRemainingStock(
+        newItem.productId,
+        variantIdOrBase,
+        orders,
+      );
+      return {
+        success: false,
+        error:
+          availableForCart === 0
+            ? `Der Artikel ${newItem.productName} (${newItem.variantName}) ist mit der gewählten Stückzahl bereits im Warenkorb oder im Atelier ausverkauft (Verfügbar: ${remaining} Stück).`
+            : `Nicht genügend freier Bestand für ${newItem.productName}. Sie können noch maximal ${availableForCart} Stück in den Warenkorb legen.`,
+      };
+    }
 
     const existingIndex = cart.findIndex(
       (item) =>
@@ -113,24 +136,12 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     if (existingIndex >= 0) {
       const currentQty = cart[existingIndex].quantity;
       const desiredQty = currentQty + newItem.quantity;
-      if (desiredQty > availableStock) {
-        return {
-          success: false,
-          error: `Maximale Stückzahl für ${newItem.productName} (${newItem.variantName}) erreicht. Verfügbar: ${availableStock} Stück.`,
-        };
-      }
       nextCart = [...cart];
       nextCart[existingIndex] = {
         ...nextCart[existingIndex],
         quantity: desiredQty,
       };
     } else {
-      if (newItem.quantity > availableStock) {
-        return {
-          success: false,
-          error: `Nicht genügend Bestand für ${newItem.productName}. Verfügbar: ${availableStock} Stück.`,
-        };
-      }
       const createdItem: CartItem = {
         ...newItem,
         id: `cart-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -154,21 +165,35 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     newQty: number,
   ): { success: boolean; error?: string } => {
     if (newQty <= 0) {
-      removeFromCart(cartItemId);
-      return { success: true };
+      return removeFromCart(cartItemId);
     }
 
     const targetItem = cart.find((i) => i.id === cartItemId);
     if (!targetItem) return { success: false, error: 'Artikel nicht gefunden' };
 
-    const prod = products.find((p) => p.id === targetItem.productId);
-    const variant = prod?.variants.find((v) => v.id === targetItem.variantId);
-    const availableStock = variant?.stock ?? prod?.stock ?? 10;
+    const variantIdOrBase = targetItem.baseVariantId || targetItem.variantId;
+    const remainingStock = getRemainingStock(
+      targetItem.productId,
+      variantIdOrBase,
+      orders,
+    );
 
-    if (newQty > availableStock) {
+    // Calculate how many other items in cart occupy the same physical variant
+    const otherInCartQty = cart
+      .filter(
+        (i) =>
+          i.id !== cartItemId &&
+          ((targetItem.baseSku && i.baseSku === targetItem.baseSku) ||
+            (targetItem.sku && i.sku === targetItem.sku)),
+      )
+      .reduce((sum, i) => sum + i.quantity, 0);
+
+    const maxAllowed = Math.max(0, remainingStock - otherInCartQty);
+
+    if (newQty > maxAllowed) {
       return {
         success: false,
-        error: `Maximale Stückzahl für dieses Modell überschritten. Maximal verfügbar: ${availableStock} Stück.`,
+        error: `Maximale Stückzahl für dieses Modell überschritten. Maximal bestellbar: ${maxAllowed} Stück (Lagerbestand: ${remainingStock}).`,
       };
     }
 
@@ -187,15 +212,31 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     return { success: true };
   };
 
-  const removeFromCart = (cartItemId: string) => {
+  const removeFromCart = (
+    cartItemId: string,
+  ): { success: boolean; error?: string } => {
     const nextCart = cart.filter((item) => item.id !== cartItemId);
-    saveCart(nextCart);
+    const saveRes = saveCart(nextCart);
+    if (!saveRes.success) {
+      setStorageError(
+        saveRes.error || 'Fehler beim Aktualisieren des Warenkorbs',
+      );
+      return { success: false, error: saveRes.error };
+    }
     setCart(nextCart);
+    setStorageError(null);
+    return { success: true };
   };
 
-  const clearCart = () => {
-    saveCart([]);
+  const clearCart = (): { success: boolean; error?: string } => {
+    const saveRes = saveCart([]);
+    if (!saveRes.success) {
+      setStorageError(saveRes.error || 'Fehler beim Leeren des Warenkorbs');
+      return { success: false, error: saveRes.error };
+    }
     setCart([]);
+    setStorageError(null);
+    return { success: true };
   };
 
   const refreshOrders = () => {
@@ -216,10 +257,28 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
       return { success: false, error: 'Der Warenkorb ist leer.' };
     }
 
+    // Verify stock for all items before accepting order
+    for (const item of cart) {
+      const variantIdOrBase = item.baseVariantId || item.variantId;
+      const remaining = getRemainingStock(
+        item.productId,
+        variantIdOrBase,
+        orders,
+      );
+      if (remaining < item.quantity) {
+        return {
+          success: false,
+          error: `Bestellabschluss nicht möglich: Der Lagerbestand für ${item.productName} (${item.variantName}) reicht nicht aus. Verfügbar: ${remaining} Stück, im Warenkorb: ${item.quantity} Stück.`,
+        };
+      }
+    }
+
     const orderItems: OrderItem[] = cart.map((item) => ({
       productName: item.productName,
       variantName: item.variantName,
       sku: item.sku,
+      baseSku: item.baseSku,
+      baseVariantId: item.baseVariantId,
       quantity: item.quantity,
       unitPriceEur: item.unitPriceEur,
       totalPriceEur: item.unitPriceEur * item.quantity,
@@ -227,7 +286,6 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
 
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const orderId = `LW-2026-${randomSuffix}`;
-    // Always use reference date 2026-09-25 or current day formatted YYYY-MM-DD
     const todayStr = '2026-09-25';
 
     const newOrder: Order = {
@@ -239,6 +297,8 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
       shippingAddress: details.shippingAddress,
       items: orderItems,
       totalAmountEur: cartTotalEur,
+      netAmountEur: cartSubtotalEur,
+      taxAmountEur: cartTaxEur,
       status: 'Eingegangen (Demo)',
       origin: 'local_demo',
       paymentMethod: 'Rechnung (Demo)',
@@ -254,16 +314,30 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
 
     // Update state
     setOrders((prev) => [newOrder, ...prev]);
-    clearCart();
-    setStorageError(null);
+
+    // Clear cart: even if localStorage write fails, empty in-memory cart to prevent duplicate submission
+    const clearRes = saveCart([]);
+    setCart([]);
+    if (!clearRes.success) {
+      setStorageError(
+        'Bestellung erfolgreich angelegt, aber der lokale Warenkorb konnte im Browser nicht geleert werden.',
+      );
+    } else {
+      setStorageError(null);
+    }
+
     return { success: true, order: newOrder };
   };
 
-  const resetDemoData = () => {
+  const resetDemoData = (): { success: boolean; error?: string } => {
     const res = resetDemoOrders();
     if (res.success && res.data) {
       setOrders(res.data);
+      setStorageError(null);
+      return { success: true };
     }
+    setStorageError(res.error || 'Fehler beim Zurücksetzen der Demodaten');
+    return { success: false, error: res.error };
   };
 
   return (

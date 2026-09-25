@@ -101,6 +101,7 @@ export function KonfiguratorClient() {
   const [dropLength, setDropLength] = useState(DROP_LENGTHS[0]);
   const [protocol, setProtocol] = useState(PROTOCOLS[0]);
   const [addedNotice, setAddedNotice] = useState(false);
+  const [stockError, setStockError] = useState<string | null>(null);
 
   const basePrice = 3450;
   const totalPrice =
@@ -117,13 +118,29 @@ export function KonfiguratorClient() {
   }[ambient];
 
   const handleAddToCart = () => {
-    addToCart({
+    setStockError(null);
+    const baseSku =
+      finish.id === 'brass'
+        ? 'LW-KOR-BRS-01'
+        : finish.id === 'basalt'
+          ? 'LW-KOR-BST-02'
+          : 'LW-KOR-STL-03';
+    const baseVariantId =
+      finish.id === 'brass'
+        ? 'standard-brass'
+        : finish.id === 'basalt'
+          ? 'basalt-patina'
+          : 'black-steel';
+
+    const res = addToCart({
       productId: 'korona-i',
       productSlug: 'korona-i',
       productName: 'KORONA I (Atelier-Konfiguration)',
       variantId: `custom-${finish.id}-${kelvin}k`,
       variantName: `${finish.name} (${kelvin} K, ${dropLength.label})`,
       sku: generatedSku,
+      baseSku,
+      baseVariantId,
       unitPriceEur: totalPrice,
       quantity: 1,
       image: '/media/korona-i.jpg',
@@ -135,8 +152,12 @@ export function KonfiguratorClient() {
       },
     });
 
-    setAddedNotice(true);
-    setTimeout(() => setAddedNotice(false), 5000);
+    if (res.success) {
+      setAddedNotice(true);
+      setTimeout(() => setAddedNotice(false), 5000);
+    } else {
+      setStockError(res.error || 'Artikel konnte nicht hinzugefügt werden.');
+    }
   };
 
   return (
@@ -499,7 +520,7 @@ export function KonfiguratorClient() {
             </div>
 
             <p className="font-mono text-xs text-stone-600">
-              Inkl. 19% MwSt. · Kostenloser versicherter Kurierversand · 3-5
+              Inkl. 20 % USt. · Kostenloser versicherter Kurierversand · 3-5
               Werktage Fertigungszeit.
             </p>
 
@@ -510,6 +531,15 @@ export function KonfiguratorClient() {
             >
               Konfiguration in den Warenkorb übernehmen
             </button>
+
+            {stockError && (
+              <div
+                className="rounded-sm border border-red-300 bg-red-50 p-3.5 text-xs text-red-900"
+                role="alert"
+              >
+                {stockError}
+              </div>
+            )}
 
             {addedNotice && (
               <div

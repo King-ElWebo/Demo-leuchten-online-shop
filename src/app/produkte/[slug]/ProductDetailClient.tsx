@@ -6,6 +6,7 @@ import Link from 'next/link';
 import type { Product, ProductVariant } from '@/lib/domain/types';
 import { useShop } from '@/lib/domain/context';
 import { formatPriceEur } from '@/lib/domain/formatters';
+import { getRemainingStock, getAvailableForCart } from '@/lib/domain/stock';
 
 interface ProductDetailClientProps {
   product: Product;
@@ -16,18 +17,31 @@ export function ProductDetailClient({
   product,
   relatedProducts,
 }: ProductDetailClientProps) {
-  const { addToCart } = useShop();
+  const { addToCart, cart, orders } = useShop();
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(
     product.variants[0],
   );
   const [quantity, setQuantity] = useState(1);
   const [addedNotice, setAddedNotice] = useState(false);
+  const [stockError, setStockError] = useState<string | null>(null);
 
   const currentPriceEur = product.basePriceEur + selectedVariant.priceDeltaEur;
-  const maxAvailable = Math.min(selectedVariant.stock, 10);
+  const remainingStock = getRemainingStock(
+    product.id,
+    selectedVariant.id,
+    orders,
+  );
+  const availableForCart = getAvailableForCart(
+    product.id,
+    selectedVariant.id,
+    cart,
+    orders,
+  );
+  const maxAvailable = Math.min(availableForCart, 10);
 
   const handleAddToCart = () => {
-    addToCart({
+    setStockError(null);
+    const res = addToCart({
       productId: product.id,
       productSlug: product.slug,
       productName: product.name,
@@ -41,10 +55,14 @@ export function ProductDetailClient({
         finish: selectedVariant.name,
       },
     });
-    setAddedNotice(true);
-    setTimeout(() => {
-      setAddedNotice(false);
-    }, 4000);
+    if (res.success) {
+      setAddedNotice(true);
+      setTimeout(() => {
+        setAddedNotice(false);
+      }, 4000);
+    } else {
+      setStockError(res.error || 'Artikel konnte nicht hinzugefügt werden.');
+    }
   };
 
   return (
@@ -131,7 +149,7 @@ export function ProductDetailClient({
                 {formatPriceEur(currentPriceEur)}
               </span>
               <span className="font-mono text-xs text-stone-600">
-                inkl. 19% MwSt., versandkostenfrei
+                inkl. 20 % USt., versandkostenfrei
               </span>
             </div>
           </div>
@@ -160,6 +178,7 @@ export function ProductDetailClient({
             >
               {product.variants.map((v) => {
                 const isSelected = selectedVariant.id === v.id;
+                const vStock = getRemainingStock(product.id, v.id, orders);
                 return (
                   <button
                     key={v.id}
@@ -168,7 +187,10 @@ export function ProductDetailClient({
                     aria-checked={isSelected}
                     onClick={() => {
                       setSelectedVariant(v);
-                      if (quantity > v.stock) setQuantity(Math.max(1, v.stock));
+                      setStockError(null);
+                      if (quantity > vStock && vStock > 0) {
+                        setQuantity(vStock);
+                      }
                     }}
                     className={`flex items-center justify-between rounded-sm border p-3.5 text-left transition-all ${
                       isSelected
@@ -191,8 +213,8 @@ export function ProductDetailClient({
                           : 'Inklusive'}
                       </span>
                       <p className="font-mono text-[10px] text-stone-600">
-                        {v.stock > 0
-                          ? `${v.stock} Stück verfügbar`
+                        {vStock > 0
+                          ? `${vStock} Stück verfügbar`
                           : 'Derzeit vergriffen'}
                       </p>
                     </div>
@@ -204,16 +226,28 @@ export function ProductDetailClient({
 
           {/* Stock & Availability Info */}
           <div className="rounded-sm bg-stone-100 p-4 font-mono text-xs space-y-1">
-            <div className="flex items-center gap-2 text-emerald-800">
-              <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
-              <span className="font-semibold">
-                Sofort versandfertig aus Atelier
-              </span>
-            </div>
-            <p className="text-stone-600">
-              Geprüft und signiert. Lieferzeit ca. 3–5 Werktage
-              (Spezial-Kunsttransport).
-            </p>
+            {remainingStock > 0 ? (
+              <>
+                <div className="flex items-center gap-2 text-emerald-800">
+                  <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
+                  <span className="font-semibold">
+                    Sofort versandfertig ({remainingStock} Stück im Atelier
+                    verfügbar)
+                  </span>
+                </div>
+                <p className="text-stone-600">
+                  Geprüft und signiert. Lieferzeit ca. 3–5 Werktage
+                  (Spezial-Kunsttransport).
+                </p>
+              </>
+            ) : (
+              <div className="flex items-center gap-2 text-amber-800">
+                <span className="h-2 w-2 rounded-full bg-amber-600" />
+                <span className="font-semibold">
+                  Derzeit im Atelier vergriffen (Auf Anfrage gefertigt)
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Quantity & Add to Cart */}
@@ -223,7 +257,7 @@ export function ProductDetailClient({
                 <button
                   type="button"
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  disabled={quantity <= 1}
+                  disabled={quantity <= 1 || maxAvailable === 0}
                   className="px-3.5 py-2 text-stone-600 hover:bg-stone-100 disabled:opacity-40"
                   aria-label="Menge verringern"
                 >
@@ -233,14 +267,14 @@ export function ProductDetailClient({
                   className="px-4 py-2 font-mono text-sm font-semibold text-[#1E1D1B]"
                   aria-live="polite"
                 >
-                  {quantity}
+                  {maxAvailable === 0 ? 0 : quantity}
                 </span>
                 <button
                   type="button"
                   onClick={() =>
                     setQuantity((q) => Math.min(maxAvailable, q + 1))
                   }
-                  disabled={quantity >= maxAvailable}
+                  disabled={quantity >= maxAvailable || maxAvailable === 0}
                   className="px-3.5 py-2 text-stone-600 hover:bg-stone-100 disabled:opacity-40"
                   aria-label="Menge erhöhen"
                 >
@@ -251,12 +285,25 @@ export function ProductDetailClient({
               <button
                 type="button"
                 onClick={handleAddToCart}
-                disabled={selectedVariant.stock === 0}
+                disabled={remainingStock === 0 || maxAvailable === 0}
                 className="flex-1 rounded-sm bg-[#8F4400] px-6 py-3 font-mono text-xs font-semibold uppercase tracking-widest text-white shadow-sm transition-all hover:bg-[#783800] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#8F4400] disabled:bg-stone-300"
               >
-                In den Warenkorb ({formatPriceEur(currentPriceEur * quantity)})
+                {remainingStock === 0
+                  ? 'Im Atelier vergriffen'
+                  : maxAvailable === 0
+                    ? 'Max. Menge im Warenkorb'
+                    : `In den Warenkorb (${formatPriceEur(currentPriceEur * quantity)})`}
               </button>
             </div>
+
+            {stockError && (
+              <div
+                className="rounded-sm border border-red-300 bg-red-50 p-3.5 text-xs text-red-900"
+                role="alert"
+              >
+                {stockError}
+              </div>
+            )}
 
             {/* Added Confirmation Banner */}
             {addedNotice && (

@@ -105,12 +105,12 @@ List every public route. Route paths are the source for `tests/e2e/routes.ts`.
 
 **Page purpose:** Transparente Verwaltung aller ausgewählten Standard- und konfigurierten Leuchten mit Bestandsvalidierung.
 
-| Section         | Purpose                                | Required content/data                           | Required action or interaction       | Priority  |
-| --------------- | -------------------------------------- | ----------------------------------------------- | ------------------------------------ | --------- |
-| Positionsliste  | Anzeige aller konfigurierten Artikel   | Bild, Titel, Konfigurationsdetails, Einzelpreis | Menge +/- ändern, Position entfernen | Primary   |
-| Preisübersicht  | Aufschlüsselung von Netto, MwSt, Total | Zwischensumme, 20% MwSt, Versandkosten (0€)     | Sofortige Neuberechnung              | Primary   |
-| Speicherstatus  | Transparenz über LocalStorage          | Indikator für lokale Speicherung im Browser     | Persistenz über Reload               | Secondary |
-| Kassen-Absprung | Weiterleitung zur Demo-Kasse           | Primärer CTA-Button                             | Klick führt zu `/kasse`              | Primary   |
+| Section         | Purpose                                   | Required content/data                               | Required action or interaction       | Priority  |
+| --------------- | ----------------------------------------- | --------------------------------------------------- | ------------------------------------ | --------- |
+| Positionsliste  | Anzeige aller konfigurierten Artikel      | Bild, Titel, Konfigurationsdetails, Einzelpreis     | Menge +/- ändern, Position entfernen | Primary   |
+| Preisübersicht  | Aufschlüsselung von Netto, 20% USt, Total | Zwischensumme (Netto), 20% USt., Versandkosten (0€) | Sofortige Neuberechnung              | Primary   |
+| Speicherstatus  | Transparenz über LocalStorage             | Indikator für lokale Speicherung im Browser         | Persistenz über Reload               | Secondary |
+| Kassen-Absprung | Weiterleitung zur Demo-Kasse              | Primärer CTA-Button                                 | Klick führt zu `/kasse`              | Primary   |
 
 ### Route: `/kasse` (Demo-Bestellabschluss)
 

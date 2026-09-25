@@ -53,6 +53,8 @@ export interface CartItem {
   variantId: string;
   variantName: string;
   sku: string;
+  baseSku?: string;
+  baseVariantId?: string;
   unitPriceEur: number;
   quantity: number;
   image: string;
@@ -73,6 +75,8 @@ export interface OrderItem {
   productName: string;
   variantName: string;
   sku: string;
+  baseSku?: string;
+  baseVariantId?: string;
   quantity: number;
   unitPriceEur: number;
   totalPriceEur: number;
@@ -86,7 +90,9 @@ export interface Order {
   customerCompany?: string;
   shippingAddress: string;
   items: OrderItem[];
-  totalAmountEur: number;
+  totalAmountEur: number; // Brutto
+  netAmountEur?: number; // Netto (totalAmountEur / 1.20)
+  taxAmountEur?: number; // 20% USt. (totalAmountEur - netAmountEur)
   status: OrderStatus;
   origin: OrderOrigin;
   paymentMethod: 'Rechnung (Demo)';
@@ -120,8 +126,12 @@ export interface InventoryItem {
 
 export interface MerchantMetrics {
   timeframeDays: number;
-  totalRevenueEur: number;
+  totalRevenueEur: number; // Brutto
+  netRevenueEur: number; // Netto
+  taxRevenueEur: number; // 20% USt.
   ordersCount: number;
+  historicalOrdersCount: number;
+  localOrdersCount: number;
   averageOrderValueEur: number;
   uniqueVisitorsCount: number;
   sessionsCount: number;

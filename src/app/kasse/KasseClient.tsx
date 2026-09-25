@@ -191,7 +191,7 @@ export function KasseClient() {
                   ))}
                   <tr className="bg-stone-50/70 font-semibold">
                     <td colSpan={3} className="px-4 py-3 text-right">
-                      Gesamtbetrag (inkl. 19% MwSt.)
+                      Gesamtbetrag (inkl. 20 % USt.)
                     </td>
                     <td className="px-4 py-3 text-right text-base text-[#8F4400]">
                       {formatPriceEur(confirmedOrder.totalAmountEur)}
@@ -474,7 +474,7 @@ export function KasseClient() {
                 <span>{formatPriceEur(cartSubtotalEur)}</span>
               </div>
               <div className="flex justify-between text-stone-600">
-                <span>19% MwSt.</span>
+                <span>20 % USt. (Österreich)</span>
                 <span>{formatPriceEur(cartTaxEur)}</span>
               </div>
               <div className="flex justify-between text-stone-600">

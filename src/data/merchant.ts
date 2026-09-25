@@ -7,6 +7,7 @@ import type {
   DailyMetricsPoint,
 } from '@/lib/domain/types';
 import { products } from './products';
+import { itemMatchesVariant } from '@/lib/domain/stock';
 
 export const BASELINE_REFERENCE_DATE = '2026-09-25';
 
@@ -242,7 +243,19 @@ export function calculateMerchantMetrics(
     (sum, o) => sum + o.totalAmountEur,
     0,
   );
+  // Net revenue before Austrian 20 % USt.
+  const netRevenueEur = Math.round((totalRevenueEur / 1.2) * 100) / 100;
+  const taxRevenueEur =
+    Math.round((totalRevenueEur - netRevenueEur) * 100) / 100;
+
   const ordersCount = filteredOrders.length;
+  const historicalOrdersCount = filteredOrders.filter(
+    (o) => o.origin === 'historical_sample',
+  ).length;
+  const localOrdersCount = filteredOrders.filter(
+    (o) => o.origin === 'local_demo',
+  ).length;
+
   const averageOrderValueEur =
     ordersCount > 0
       ? Math.round((totalRevenueEur / ordersCount) * 100) / 100
@@ -320,15 +333,15 @@ export function calculateMerchantMetrics(
     };
   });
 
-  // Inventory mapping with simulated deduction from local demo orders
+  // Inventory mapping with dynamic deduction from local demo orders (including configurator finished items)
   const inventory: InventoryItem[] = [];
   for (const prod of products) {
     for (const v of prod.variants) {
-      // Calculate local demo sold
+      // Calculate local demo sold using itemMatchesVariant for direct SKU & configurator base mapping
       const localSold = allOrders
         .filter((o) => o.origin === 'local_demo')
         .flatMap((o) => o.items)
-        .filter((item) => item.sku === v.sku)
+        .filter((item) => itemMatchesVariant(item, v, prod.id))
         .reduce((sum, item) => sum + item.quantity, 0);
 
       const currentStock = Math.max(0, v.stock - localSold);
@@ -352,7 +365,11 @@ export function calculateMerchantMetrics(
   return {
     timeframeDays: days,
     totalRevenueEur,
+    netRevenueEur,
+    taxRevenueEur,
     ordersCount,
+    historicalOrdersCount,
+    localOrdersCount,
     averageOrderValueEur,
     uniqueVisitorsCount,
     sessionsCount,

@@ -217,7 +217,7 @@ export function WarenkorbClient() {
                 <span>{formatPriceEur(cartSubtotalEur)}</span>
               </div>
               <div className="flex justify-between text-stone-600">
-                <span>19 % Mehrwertsteuer</span>
+                <span>20 % USt. (Österreich)</span>
                 <span>{formatPriceEur(cartTaxEur)}</span>
               </div>
               <div className="flex justify-between text-stone-600">

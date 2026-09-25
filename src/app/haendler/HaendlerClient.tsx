@@ -183,7 +183,7 @@ export function HaendlerClient() {
         {/* KPI 1: Umsatz */}
         <div className="rounded-sm border border-stone-200 bg-white p-5 shadow-xs">
           <span className="font-mono text-xs uppercase tracking-wider text-stone-600">
-            Gesamtumsatz
+            Bruttoumsatz (inkl. 20 % USt.)
           </span>
           <p
             className="mt-2 font-mono text-2xl font-bold text-[#1E1D1B]"
@@ -192,7 +192,7 @@ export function HaendlerClient() {
             {formatPriceEur(metrics.totalRevenueEur)}
           </p>
           <p className="mt-1 font-mono text-[11px] text-stone-500">
-            Netto vor 19% MwSt.
+            Netto: {formatPriceEur(metrics.netRevenueEur)} · 20 % USt.
           </p>
         </div>
 
@@ -208,7 +208,9 @@ export function HaendlerClient() {
             {metrics.ordersCount}
           </p>
           <p className="mt-1 font-mono text-[11px] text-stone-500">
-            in den letzten {metrics.timeframeDays} Tagen
+            {metrics.localOrdersCount > 0
+              ? `${metrics.localOrdersCount} Demo · ${metrics.historicalOrdersCount} Referenz`
+              : `in den letzten ${metrics.timeframeDays} Tagen`}
           </p>
         </div>
 
@@ -231,7 +233,7 @@ export function HaendlerClient() {
         {/* KPI 4: Besucher / Sessions */}
         <div className="rounded-sm border border-stone-200 bg-white p-5 shadow-xs">
           <span className="font-mono text-xs uppercase tracking-wider text-stone-600">
-            Besucher (Sessions)
+            Sitzungen (Benchmark)
           </span>
           <p
             className="mt-2 font-mono text-2xl font-bold text-[#1E1D1B]"
@@ -241,6 +243,7 @@ export function HaendlerClient() {
           </p>
           <p className="mt-1 font-mono text-[11px] text-stone-500">
             {metrics.uniqueVisitorsCount.toLocaleString('de-DE')} Unique Users
+            (Referenz)
           </p>
         </div>
 
@@ -391,7 +394,10 @@ export function HaendlerClient() {
             role="region"
             aria-label="Lagerbestand Tabelle (vertikal scrollbar)"
           >
-            <table className="w-full text-left font-mono text-xs">
+            <table
+              className="w-full text-left font-mono text-xs"
+              data-testid="inventory-table"
+            >
               <thead className="bg-stone-50 border-b border-stone-200 text-stone-700 sticky top-0">
                 <tr>
                   <th className="px-3 py-2">Leuchte</th>
